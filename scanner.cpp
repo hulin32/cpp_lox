@@ -70,10 +70,10 @@ void scanner::scanToken() {
         case '>': addToken(match('=') ? GREATER_EQUAL : GREATER); break;
         case '/':
             if (match('/')) {
-            // A comment goes until the end of the line.
-            while (peek() != '\n' && !isAtEnd()) advance();
+                // A comment goes until the end of the line.
+                while (peek() != '\n' && !isAtEnd()) advance();
             } else {
-            addToken(SLASH);
+                addToken(SLASH);
             }
             break;
         case ' ':

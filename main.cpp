@@ -1,6 +1,7 @@
-#include "lox.h"
+// Copyright 2020 <Copyright hulin>
 
-int main(int argc, const char *argv[])
-{
-   lox::runScript(argc, argv);
+#include "./lox.h"
+
+int main(int argc, const char *argv[]) {
+    lox::runScript(argc, argv);
 }

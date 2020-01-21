@@ -5,8 +5,8 @@
 #include <fstream>
 #include <sstream>
 
-#include "./lox.h"
-#include "./scanner.h"
+#include "./lox.hpp"
+#include "./scanner.hpp"
 
 
 using std::string;

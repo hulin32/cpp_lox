@@ -3,155 +3,107 @@
 #include <string>
 #include <iostream>
 #include <list>
+#include <memory>
+#include <algorithm>
 
 #include "./Expr.hpp"
-#include "./token.hpp"
+// #include "./token.hpp"
 
 using std::string;
 using std::list;
 using std::cout;
 using std::endl;
+using std::unique_ptr;
 
-Assign::Assign(Token name, Expr value): name(name), value(value) {}
-string Assign::accept(Visitor& visitor) {
-  return visitor.visitAssignExpr(*this);
+Literal::Literal(string value_): value(value_) { }
+string Literal::accept(shared_ptr<Visitor> visitor) {
+  return visitor->visitLiteralExpr(*this);
 }
 
-class Binary: public Expr {
- public:
-    Binary(Expr left, Token operation, Expr right):
-    left(left), operation(operation), right(right) {}
+// Assign::Assign(Token name, unique_ptr<Expr> value_): name(name) {
+//   value = std::move(value);
+// }
+// string Assign::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitAssignExpr(*this);
+// }
 
-    string accept(Visitor& visitor) {
-      return visitor.visitBinaryExpr(*this);
-    }
 
-    Expr left;
-    Token operation;
-    Expr right;
-};
+// Binary::Binary(unique_ptr<Expr> left_, Token operation, unique_ptr<Expr> right_):
+// operation(operation) {
+//   left = std::move(left_);
+//   right = std::move(right_);
+// }
+// string Binary::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitBinaryExpr(*this);
+// }
 
-class Call: public Expr {
- public:
-    Call(Expr callee, Token paren, list<Expr> arguments):
-    callee(callee), paren(paren), arguments(arguments) {}
+// Call::Call(unique_ptr<Expr> callee, Token paren, list<unique_ptr<Expr>> arguments_):
+// paren(paren) {
+//   callee = std::move(callee);
+//   arguments = std::move(arguments_);
+// }
+// string Call::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitCallExpr(*this);
+// }
 
-    string accept(Visitor& visitor) {
-      return visitor.visitCallExpr(*this);
-    }
 
-    Expr callee;
-    Token paren;
-    list<Expr> arguments;
-};
+// Get::Get(unique_ptr<Expr> object_, Token name): name(name) {
+//   object = std::move(object_);
+// }
+// string Get::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitGetExpr(*this);
+// }
 
-class Get: public Expr {
- public:
-    Get(Expr object, Token name):
-    name(name), object(object) {}
+// Grouping::Grouping(unique_ptr<Expr> expression_) {
+//   expression = std::move(expression_);
+// }
+// string Grouping::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitGroupingExpr(*this);
+// }
 
-    string accept(Visitor& visitor) {
-      return visitor.visitGetExpr(*this);
-    }
+// Logical::Logical(
+//   unique_ptr<Expr> left_,
+//   Token operation,
+//   unique_ptr<Expr> right_
+// ): operation(operation) {
+//   left = std::move(left_);
+//   right = std::move(right_);
+// }
+// string Logical::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitLogicalExpr(*this);
+// }
 
-    Token name;
-    Expr object;
-};
 
-class Grouping: public Expr {
- public:
-    explicit Grouping(Expr expression): expression(expression) {}
+// Set::Set(
+//   unique_ptr<Expr> object_,
+//   Token name,
+//   unique_ptr<Expr> value_
+// ): name(name) {
+//   object = std::move(object_);
+//   value = std::move(value_);
+// }
+// string Set::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitSetExpr(*this);
+// }
 
-    string accept(Visitor& visitor) {
-      return visitor.visitGroupingExpr(*this);
-    }
+// Super::Super(Token keyword, Token method): keyword(keyword), method(method) {}
+// string Super::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitSuperExpr(*this);
+// }
 
-    Expr expression;
-};
+// This::This(Token keyword): keyword(keyword) {}
+// string This::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitThisExpr(*this);
+// }
 
-class Literal: public Expr {
- public:
-    explicit Literal(string value): value(value) {}
+// Unary::Unary(Token operation, unique_ptr<Expr> right): operation(operation) {
+//   right = std::move(right);
+// }
+// string Unary::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitUnaryExpr(*this);
+// }
 
-    string accept(Visitor& visitor) {
-      return visitor.visitLiteralExpr(*this);
-    }
-
-    string value;
-};
-
-class Logical: public Expr {
- public:
-    Logical(Expr left, Token operation, Expr right):
-    left(left), operation(operation), right(right) {}
-
-    string accept(Visitor& visitor) {
-      return visitor.visitLogicalExpr(*this);
-    }
-
-    Expr left;
-    Token operation;
-    Expr right;
-};
-
-class Set: public Expr {
- public:
-    Set(Expr object, Token name, Expr value):
-    object(object), name(name), value(value) {}
-
-    string accept(Visitor& visitor) {
-      return visitor.visitSetExpr(*this);
-    }
-
-    Expr object;
-    Token name;
-    Expr value;
-};
-
-class Super: public Expr {
- public:
-    Super(Token keyword, Token method):
-    keyword(keyword), method(method) {}
-
-    string accept(Visitor& visitor) {
-      return visitor.visitSuperExpr(*this);
-    }
-
-    Token keyword;
-    Token method;
-};
-
-class This : public Expr{
- public:
-    explicit This(Token keyword): keyword(keyword) {}
-
-    string accept(Visitor& visitor) {
-      return visitor.visitThisExpr(*this);
-    }
-
-    Token keyword;
-};
-
-class Unary: public Expr {
- public:
-    Unary(Token operation, Expr right):
-    operation(operation), right(right) {}
-
-    string accept(Visitor& visitor) {
-      return visitor.visitUnaryExpr(*this);
-    }
-
-    Token operation;
-    Expr right;
-};
-
-class Variable: public Expr {
- public:
-    explicit Variable(Token name): name(name) {}
-
-    string accept(Visitor& visitor) {
-      return visitor.visitVariableExpr(*this);
-    }
-
-    Token name;
-};
+// Variable::Variable(Token name): name(name) {}
+// string Variable::accept(unique_ptr<Visitor> visitor) {
+//   return visitor->visitVariableExpr(*this);
+// }

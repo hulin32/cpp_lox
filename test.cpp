@@ -1,11 +1,13 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
+#include <algorithm>
 #include "./token.hpp"
-#include "./Expr.hpp"
+#include "Expr.hpp"
 #include "./AstPrinter.hpp"
 
-using std::string;
+using std::shared_ptr;
 
 int main(int argc, char const *argv[]) {
     // Expr expression = (*new Binary(
@@ -15,8 +17,8 @@ int main(int argc, char const *argv[]) {
     //    * (new Token(STAR, "*", "", 1)),
     //     *(new Grouping(
     //         *(new Literal("45.67"))))));
-    Literal literal("45.67");
+    Literal* literal = new Literal("22.1");
     AstPrinter astPrinter;
-    std::cout << astPrinter.print(&literal) << std::endl;
+    std::cout << astPrinter.print(*literal) << std::endl;
     return 0;
 }

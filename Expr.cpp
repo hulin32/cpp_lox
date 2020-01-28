@@ -13,11 +13,11 @@ using std::string;
 using std::list;
 using std::cout;
 using std::endl;
-using std::unique_ptr;
+using std::shared_ptr;
 
 Literal::Literal(string value_): value(value_) { }
-string Literal::accept(shared_ptr<Visitor> visitor) {
-  return visitor->visitLiteralExpr(*this);
+string Literal::accept(Visitor& visitor) {
+  return visitor.visitLiteralExpr(*this);
 }
 
 // Assign::Assign(Token name, unique_ptr<Expr> value_): name(name) {

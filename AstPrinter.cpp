@@ -12,8 +12,8 @@ using std::shared_ptr;
 using std::make_shared;
 using std::forward;
 
-string AstPrinter::print(Expr& expr) {
-    return expr.accept(make_shared<Visitor>(this));
+string AstPrinter::print(shared_ptr<Expr> expr) {
+    return expr->accept(*this);
 }
 
 string AstPrinter::visitLiteralExpr(const Literal expr) {
@@ -71,15 +71,15 @@ string AstPrinter::parenthesize_recursive() {
 template <typename R,  typename... OtherArgs>
 string AstPrinter::parenthesize_recursive(R expr, OtherArgs&... exprs) {
     string str;
-    str = expr->accept(unique_ptr<Visitor>(this));
-    return str + " " + parenthesize_recursive(forward<OtherArgs>(exprs)...);
+    str = expr.accept(shared_ptr<Visitor>(this));
+    return str + " " + parenthesize_recursive(exprs...);
 }
 
 template <typename... OtherArgs>
 string AstPrinter::parenthesize(string name, OtherArgs&... exprs) {
     string m_ast;
     m_ast += "(" + name;
-    m_ast += parenthesize_recursive(forward<OtherArgs>(exprs)...);
+    m_ast += parenthesize_recursive(exprs...);
     m_ast += ")";
     return m_ast;
 }

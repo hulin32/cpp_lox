@@ -10,10 +10,11 @@
 #include "./Expr.hpp"
 
 using std::string;
+using std::shared_ptr;
 
 class AstPrinter: public Visitor {
  public:
-    string print(Expr& expr);
+    string print(shared_ptr<Expr> expr);
     string visitLiteralExpr(const Literal expr);
    //  string visitAssignExpr(const Assign& expr);
    //  string visitBinaryExpr(const Binary& expr);

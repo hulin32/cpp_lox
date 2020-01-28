@@ -32,14 +32,14 @@ class Visitor {
 
 class Expr {
  public:
-    virtual string accept(shared_ptr<Visitor> visitor) = 0;
+    virtual string accept(Visitor& visitor) = 0;
     virtual ~Expr() = default;
 };
 
 class Literal: public Expr {
  public:
     explicit Literal(string value_);
-    string accept(shared_ptr<Visitor> visitor) override;
+    string accept(Visitor& visitor) override;
     string value;
 };
 

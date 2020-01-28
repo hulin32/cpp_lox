@@ -8,6 +8,7 @@
 #include "./AstPrinter.hpp"
 
 using std::shared_ptr;
+using std::make_shared;
 
 int main(int argc, char const *argv[]) {
     // Expr expression = (*new Binary(
@@ -17,8 +18,8 @@ int main(int argc, char const *argv[]) {
     //    * (new Token(STAR, "*", "", 1)),
     //     *(new Grouping(
     //         *(new Literal("45.67"))))));
-    Literal* literal = new Literal("22.1");
+    shared_ptr<Literal> literal(new Literal("22.1"));
     AstPrinter astPrinter;
-    std::cout << astPrinter.print(*literal) << std::endl;
+    std::cout << astPrinter.print(literal) << std::endl;
     return 0;
 }

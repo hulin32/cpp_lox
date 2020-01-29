@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <algorithm>
+#include <exception>
 #include "./token.hpp"
 #include "Expr.hpp"
 #include "./AstPrinter.hpp"
@@ -19,7 +20,7 @@ int main(int argc, char const *argv[]) {
     //     *(new Grouping(
     //         *(new Literal("45.67"))))));
     shared_ptr<Literal> literal(new Literal("22.1"));
-    AstPrinter astPrinter;
-    std::cout << astPrinter.print(literal) << std::endl;
+    shared_ptr<AstPrinter> astPrinter(new AstPrinter);
+    std::cout << astPrinter->print(literal) << std::endl;
     return 0;
 }

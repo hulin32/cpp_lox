@@ -1,5 +1,6 @@
 // Copyright 2020 <Copyright hulin>
 
+#include <iostream>
 #include <utility>
 #include <string>
 #include <vector>
@@ -9,14 +10,14 @@
 
 using std::string;
 using std::shared_ptr;
-using std::make_shared;
-using std::forward;
+using std::cout;
+using std::endl;
 
 string AstPrinter::print(shared_ptr<Expr> expr) {
-    return expr->accept(*this);
+    return expr->accept(shared_from_this());
 }
 
-string AstPrinter::visitLiteralExpr(const Literal expr) {
+string AstPrinter::visitLiteralExpr(const Literal& expr) {
     if (expr.value == "") return "nil";
     return expr.value;
 }

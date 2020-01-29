@@ -16,7 +16,8 @@ class Literal;
 
 class Visitor {
  public:
-    virtual string visitLiteralExpr(const Literal expr) = 0;
+    virtual string visitLiteralExpr(const Literal& expr) = 0;
+    virtual ~Visitor() = default;
     // virtual string visitAssignExpr(const Assign& expr) = 0;
     // virtual string visitBinaryExpr(const Binary& expr) = 0;
     // virtual string visitCallExpr(const Call& expr) = 0;
@@ -32,14 +33,14 @@ class Visitor {
 
 class Expr {
  public:
-    virtual string accept(Visitor& visitor) = 0;
+    virtual string accept(shared_ptr<Visitor> visitor) = 0;
     virtual ~Expr() = default;
 };
 
 class Literal: public Expr {
  public:
     explicit Literal(string value_);
-    string accept(Visitor& visitor) override;
+    string accept(shared_ptr<Visitor> visitor) override;
     string value;
 };
 

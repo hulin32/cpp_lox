@@ -7,7 +7,7 @@
 #include <memory>
 #include "./Expr.hpp"
 #include "./AstPrinter.hpp"
-#include "./token.hpp"
+#include "./Token.hpp"
 
 using std::string;
 using std::shared_ptr;

@@ -3,13 +3,13 @@
 #include <string>
 #include <list>
 
-#include "./scanner.h"
-#include "./token.h"
-#include "./lox.h"
+#include "./Scanner.hpp"
+#include "./Token.hpp"
+#include "./lox.hpp"
 
 using std::string;
 
-map<string, TokenType> scanner::keywords = {
+map<string, TokenType> Scanner::keywords = {
     {"and", AND},
     {"class",  CLASS},
     {"else",   ELSE},
@@ -28,15 +28,15 @@ map<string, TokenType> scanner::keywords = {
     {"while",  WHILE},
 };
 
-scanner::scanner(string source): source(source) {}
+Scanner::Scanner(string source): source(source) {}
 
-scanner::~scanner() {
+Scanner::~Scanner() {
     for (Token *token : tokens) {
         delete token;
     }
 }
 
-list<Token*> scanner::scanTokens() {
+list<Token*> Scanner::scanTokens() {
     while (!isAtEnd()) {
       // We are at the beginning of the next lexeme.
       start = current;
@@ -47,11 +47,11 @@ list<Token*> scanner::scanTokens() {
     return tokens;
 }
 
-bool scanner::isAtEnd() {
+bool Scanner::isAtEnd() {
     return current >= source.size();
 }
 
-void scanner::scanToken() {
+void Scanner::scanToken() {
     char c = advance();
     switch (c) {
         case '(': addToken(LEFT_PAREN); break;
@@ -99,28 +99,28 @@ void scanner::scanToken() {
     }
 }
 
-char scanner::advance() {
+char Scanner::advance() {
     current++;
     return source.at(current - 1);
 }
 
-void scanner::addToken(TokenType type) {
+void Scanner::addToken(TokenType type) {
     addToken(type, "");
 }
 
-void scanner::addToken(TokenType type, Object literal) {
+void Scanner::addToken(TokenType type, Object literal) {
     string text = source.substr(start, current);
     tokens.push_back(new Token(type, text, literal, line));
 }
 
-bool scanner::match(char expected) {
+bool Scanner::match(char expected) {
     if (isAtEnd()) return false;
     if (source.at(current) != expected) return false;
     current++;
     return true;
 }
 
-void scanner::generateString() {
+void Scanner::generateString() {
     while (peek() != '"' && !isAtEnd()) {
       if (peek() == '\n') line++;
       advance();
@@ -141,7 +141,7 @@ void scanner::generateString() {
     addToken(STRING, "");
 }
 
-void scanner::generateNumber() {
+void Scanner::generateNumber() {
     while (isDigit(peek())) advance();
 
     // Look for a fractional part.
@@ -154,7 +154,7 @@ void scanner::generateNumber() {
     addToken(NUMBER, source.substr(start, current));
 }
 
-void scanner::identifier() {
+void Scanner::identifier() {
     while (isAlphaNumeric(peek())) advance();
     string text = source.substr(start, current);
     auto found = keywords.find(text);
@@ -167,26 +167,26 @@ void scanner::identifier() {
     addToken(type);
 }
 
-bool scanner::isAlpha(char c) {
+bool Scanner::isAlpha(char c) {
     return (c >= 'a' && c <= 'z') ||
         (c >= 'A' && c <= 'Z') ||
         c == '_';
 }
 
-bool scanner::isDigit(char c) {
+bool Scanner::isDigit(char c) {
     return c >= '0' && c <= '9';
 }
 
-bool scanner::isAlphaNumeric(char c) {
+bool Scanner::isAlphaNumeric(char c) {
     return isAlpha(c) || isDigit(c);
 }
 
-char scanner::peek() {
+char Scanner::peek() {
     if (isAtEnd()) return '\0';
     return source.at(current);
 }
 
-char scanner::peekNext() {
+char Scanner::peekNext() {
     if (current + 1 >= source.size()) return '\0';
     return source.at(current + 1);
 }

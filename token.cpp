@@ -1,6 +1,6 @@
 // Copyright 2020 <Copyright hulin>
 
-#include "./token.hpp"
+#include "./Token.hpp"
 
 Token::Token(TokenType type, string lexeme, Object literal, int line)
 : type(type), lexeme(lexeme), literal(literal), line(line) {}

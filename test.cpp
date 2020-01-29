@@ -4,7 +4,7 @@
 #include <memory>
 #include <algorithm>
 #include <exception>
-#include "./token.hpp"
+#include "./Token.hpp"
 #include "Expr.hpp"
 #include "./AstPrinter.hpp"
 

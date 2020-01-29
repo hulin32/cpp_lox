@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include "./lox.hpp"
-#include "./scanner.hpp"
+#include "./Scanner.hpp"
 
 
 using std::string;
@@ -59,7 +59,7 @@ void lox::report(int line, string where, string message) {
 }
 
 void lox::run(string source) {
-    scanner* scannerObj = new scanner(source);
+    Scanner* scannerObj = new Scanner(source);
     list<Token*> tokens = scannerObj->scanTokens();
 
     // For now, just print the tokens.

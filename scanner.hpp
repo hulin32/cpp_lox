@@ -6,13 +6,13 @@
 #include <string>
 #include <list>
 #include <map>
-#include "./token.hpp"
+#include "./Token.hpp"
 
 using std::string;
 using std::list;
 using std::map;
 
-class scanner {
+class Scanner {
  private:
     string source;
     list<Token*> tokens;
@@ -35,10 +35,10 @@ class scanner {
     bool isAlphaNumeric(char c);
 
  public:
-    explicit scanner(string source);
+    explicit Scanner(string source);
     list<Token*> scanTokens();
     bool isAtEnd();
-    ~scanner();
+    ~Scanner();
 };
 
 #endif  // SCANNER_HPP_

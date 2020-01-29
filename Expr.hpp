@@ -6,7 +6,7 @@
 #include <string>
 #include <list>
 #include <memory>
-#include "./token.hpp"
+#include "./Token.hpp"
 
 using std::list;
 using std::string;

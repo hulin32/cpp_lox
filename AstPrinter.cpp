@@ -72,7 +72,7 @@ string AstPrinter::parenthesize_recursive() {
 template <typename R,  typename... OtherArgs>
 string AstPrinter::parenthesize_recursive(R expr, OtherArgs&... exprs) {
     string str;
-    str = expr.accept(shared_ptr<Visitor>(this));
+    str = expr.accept(shared_from_this());
     return str + " " + parenthesize_recursive(exprs...);
 }
 

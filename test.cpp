@@ -19,8 +19,11 @@ int main(int argc, char const *argv[]) {
     //    * (new Token(STAR, "*", "", 1)),
     //     *(new Grouping(
     //         *(new Literal("45.67"))))));
-    shared_ptr<Literal> literal(new Literal("22.1"));
+    Token token(MINUS, "-", "", 1);
+    shared_ptr<Literal> left(new Literal("5"));
+    shared_ptr<Literal> right(new Literal("6"));
+    shared_ptr<Binary> binary(new Binary(left, token, right));
     shared_ptr<AstPrinter> astPrinter(new AstPrinter);
-    std::cout << astPrinter->print(literal) << std::endl;
+    std::cout << astPrinter->print(binary) << std::endl;
     return 0;
 }

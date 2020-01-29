@@ -16,8 +16,8 @@ class AstPrinter: public Visitor, public std::enable_shared_from_this<AstPrinter
  public:
     string print(shared_ptr<Expr> expr);
     string visitLiteralExpr(const Literal& expr);
-   //  string visitAssignExpr(const Assign& expr);
-   //  string visitBinaryExpr(const Binary& expr);
+    string visitAssignExpr(const Assign& expr);
+    string visitBinaryExpr(const Binary& expr);
    //  string visitCallExpr(const Call& expr);
    //  string visitGetExpr(const Get& expr);
    //  string visitGroupingExpr(const Grouping& expr);
@@ -27,14 +27,6 @@ class AstPrinter: public Visitor, public std::enable_shared_from_this<AstPrinter
    //  string visitThisExpr(const This& expr);
    //  string visitUnaryExpr(const Unary& expr);
    //  string visitVariableExpr(const Variable& expr);
- private:
-    string parenthesize_recursive();
-
-    template <typename R,  typename... OtherArgs>
-    string parenthesize_recursive(R expr, OtherArgs&... exprs);
-
-    template <typename... OtherArgs>
-    string parenthesize(string name, OtherArgs&... exprs);
 };
 
 #endif  // ASTPRINTER_HPP_

@@ -20,22 +20,21 @@ string Literal::accept(shared_ptr<Visitor> visitor) {
   return visitor->visitLiteralExpr(*this);
 }
 
-// Assign::Assign(Token name, unique_ptr<Expr> value_): name(name) {
-//   value = std::move(value);
-// }
-// string Assign::accept(unique_ptr<Visitor> visitor) {
-//   return visitor->visitAssignExpr(*this);
-// }
+Assign::Assign(Token name_, shared_ptr<Expr> value_):
+name(name_), value(value_) {}
+string Assign::accept(shared_ptr<Visitor> visitor) {
+  return visitor->visitAssignExpr(*this);
+}
 
 
-// Binary::Binary(unique_ptr<Expr> left_, Token operation, unique_ptr<Expr> right_):
-// operation(operation) {
-//   left = std::move(left_);
-//   right = std::move(right_);
-// }
-// string Binary::accept(unique_ptr<Visitor> visitor) {
-//   return visitor->visitBinaryExpr(*this);
-// }
+Binary::Binary(
+  shared_ptr<Expr> left_,
+  Token operation,
+  shared_ptr<Expr> right_
+): left(left_), operation(operation), right(right_) { }
+string Binary::accept(shared_ptr<Visitor> visitor) {
+  return visitor->visitBinaryExpr(*this);
+}
 
 // Call::Call(unique_ptr<Expr> callee, Token paren, list<unique_ptr<Expr>> arguments_):
 // paren(paren) {

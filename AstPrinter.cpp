@@ -7,6 +7,7 @@
 #include <memory>
 #include "./Expr.hpp"
 #include "./AstPrinter.hpp"
+#include "./token.hpp"
 
 using std::string;
 using std::shared_ptr;
@@ -22,12 +23,23 @@ string AstPrinter::visitLiteralExpr(const Literal& expr) {
     return expr.value;
 }
 
-// string AstPrinter::visitAssignExpr(const Assign& expr) {
-//     return "";
-// }
-// string AstPrinter::visitBinaryExpr(const Binary& expr) {
-//     return parenthesize(expr.operation.lexeme, expr.left, expr.right);
-// }
+string AstPrinter::visitAssignExpr(const Assign& expr) {
+    return "(" +
+        expr.name.lexeme +
+        " " +
+        expr.value->accept(shared_from_this()) +
+        " )";
+}
+
+string AstPrinter::visitBinaryExpr(const Binary& expr) {
+    return "(" +
+        expr.operation.lexeme +
+        " " +
+        expr.left->accept(shared_from_this()) +
+        " " +
+        expr.right->accept(shared_from_this()) +
+        ")";
+}
 
 // string AstPrinter::visitCallExpr(const Call& expr) {
 //     return "";
@@ -64,23 +76,3 @@ string AstPrinter::visitLiteralExpr(const Literal& expr) {
 // string AstPrinter::visitVariableExpr(const Variable& expr) {
 //     return "";
 // }
-
-string AstPrinter::parenthesize_recursive() {
-    return "";
-}
-
-template <typename R,  typename... OtherArgs>
-string AstPrinter::parenthesize_recursive(R expr, OtherArgs&... exprs) {
-    string str;
-    str = expr.accept(shared_from_this());
-    return str + " " + parenthesize_recursive(exprs...);
-}
-
-template <typename... OtherArgs>
-string AstPrinter::parenthesize(string name, OtherArgs&... exprs) {
-    string m_ast;
-    m_ast += "(" + name;
-    m_ast += parenthesize_recursive(exprs...);
-    m_ast += ")";
-    return m_ast;
-}

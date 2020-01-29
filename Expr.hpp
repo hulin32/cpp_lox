@@ -27,8 +27,6 @@ class Visitor {
     virtual string visitGroupingExpr(const Grouping& expr) = 0;
     virtual string visitUnaryExpr(const Unary& expr) = 0;
     // virtual string visitCallExpr(const Call& expr) = 0;
-    // virtual string visitGetExpr(const Get& expr) = 0;
-    // virtual string visitLogicalExpr(const Logical& expr) = 0;
     // virtual string visitSetExpr(const Set& expr) = 0;
     // virtual string visitSuperExpr(const Super& expr) = 0;
     // virtual string visitThisExpr(const This& expr) = 0;
@@ -83,8 +81,6 @@ class Unary: public Expr {
 // class Call: public Expr {
 //  public:
 //     Call(unique_ptr<Expr> callee, Token paren, list<unique_ptr<Expr>> arguments);
-//     string accept(unique_ptr<Visitor> visitor) override;
-//     unique_ptr<Expr> callee;
 //     Token paren;
 //     list<unique_ptr<Expr>> arguments;
 // };

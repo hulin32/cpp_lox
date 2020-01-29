@@ -20,22 +20,32 @@ string Literal::accept(shared_ptr<Visitor> visitor) {
   return visitor->visitLiteralExpr(*this);
 }
 
-// Assign::Assign(Token name, unique_ptr<Expr> value_): name(name) {
-//   value = std::move(value);
-// }
-// string Assign::accept(unique_ptr<Visitor> visitor) {
-//   return visitor->visitAssignExpr(*this);
-// }
+Assign::Assign(Token name_, shared_ptr<Expr> value_):
+name(name_), value(value_) {}
+string Assign::accept(shared_ptr<Visitor> visitor) {
+  return visitor->visitAssignExpr(*this);
+}
 
 
-// Binary::Binary(unique_ptr<Expr> left_, Token operation, unique_ptr<Expr> right_):
-// operation(operation) {
-//   left = std::move(left_);
-//   right = std::move(right_);
-// }
-// string Binary::accept(unique_ptr<Visitor> visitor) {
-//   return visitor->visitBinaryExpr(*this);
-// }
+Binary::Binary(
+  shared_ptr<Expr> left_,
+  Token operation,
+  shared_ptr<Expr> right_
+): left(left_), operation(operation), right(right_) { }
+string Binary::accept(shared_ptr<Visitor> visitor) {
+  return visitor->visitBinaryExpr(*this);
+}
+
+Grouping::Grouping(shared_ptr<Expr> expression_): expression(expression_) { }
+string Grouping::accept(shared_ptr<Visitor> visitor) {
+  return visitor->visitGroupingExpr(*this);
+}
+
+Unary::Unary(Token operation, shared_ptr<Expr> right_):
+ operation(operation), right(right_) { }
+string Unary::accept(shared_ptr<Visitor> visitor) {
+  return visitor->visitUnaryExpr(*this);
+}
 
 // Call::Call(unique_ptr<Expr> callee, Token paren, list<unique_ptr<Expr>> arguments_):
 // paren(paren) {
@@ -52,13 +62,6 @@ string Literal::accept(shared_ptr<Visitor> visitor) {
 // }
 // string Get::accept(unique_ptr<Visitor> visitor) {
 //   return visitor->visitGetExpr(*this);
-// }
-
-// Grouping::Grouping(unique_ptr<Expr> expression_) {
-//   expression = std::move(expression_);
-// }
-// string Grouping::accept(unique_ptr<Visitor> visitor) {
-//   return visitor->visitGroupingExpr(*this);
 // }
 
 // Logical::Logical(
@@ -94,13 +97,6 @@ string Literal::accept(shared_ptr<Visitor> visitor) {
 // This::This(Token keyword): keyword(keyword) {}
 // string This::accept(unique_ptr<Visitor> visitor) {
 //   return visitor->visitThisExpr(*this);
-// }
-
-// Unary::Unary(Token operation, unique_ptr<Expr> right): operation(operation) {
-//   right = std::move(right);
-// }
-// string Unary::accept(unique_ptr<Visitor> visitor) {
-//   return visitor->visitUnaryExpr(*this);
 // }
 
 // Variable::Variable(Token name): name(name) {}

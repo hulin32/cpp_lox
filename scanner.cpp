@@ -1,13 +1,14 @@
 // Copyright 2020 <Copyright hulin>
 
 #include <string>
-#include <list>
+#include <vector>
 
 #include "./Scanner.hpp"
 #include "./Token.hpp"
 #include "./lox.hpp"
 
 using std::string;
+using std::vector;
 
 map<string, TokenType> Scanner::keywords = {
     {"and", AND},
@@ -30,20 +31,15 @@ map<string, TokenType> Scanner::keywords = {
 
 Scanner::Scanner(string source): source(source) {}
 
-Scanner::~Scanner() {
-    for (Token *token : tokens) {
-        delete token;
-    }
-}
-
-list<Token*> Scanner::scanTokens() {
+vector<Token> Scanner::scanTokens() {
     while (!isAtEnd()) {
       // We are at the beginning of the next lexeme.
       start = current;
       scanToken();
     }
 
-    tokens.push_back(new Token(TOKEN_EOF, "", "", line));
+    Token token(TOKEN_EOF, "", "", line);
+    tokens.push_back(token);
     return tokens;
 }
 
@@ -110,7 +106,8 @@ void Scanner::addToken(TokenType type) {
 
 void Scanner::addToken(TokenType type, Object literal) {
     string text = source.substr(start, current);
-    tokens.push_back(new Token(type, text, literal, line));
+    Token token(type, text, literal, line);
+    tokens.push_back(token);
 }
 
 bool Scanner::match(char expected) {

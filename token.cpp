@@ -8,4 +8,3 @@ Token::Token(TokenType type, string lexeme, Object literal, int line)
 string Token::toString() {
     return to_string(type) + " " + lexeme + " " + literal;
 }
-

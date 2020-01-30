@@ -4,16 +4,23 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <memory>
+#include <vector>
 
 #include "./lox.hpp"
 #include "./Scanner.hpp"
-
+#include "./Parser.hpp"
+#include "./Expr.hpp"
+#include "./AstPrinter.hpp"
 
 using std::string;
 using std::stringstream;
 using std::ifstream;
 using std::cin;
 using std::cout;
+using std::endl;
+using std::shared_ptr;
+using std::vector;
 
 bool lox::hadError = false;
 bool lox::hadRuntimeError = false;
@@ -59,12 +66,16 @@ void lox::report(int line, string where, string message) {
 }
 
 void lox::run(string source) {
-    Scanner* scannerObj = new Scanner(source);
-    list<Token*> tokens = scannerObj->scanTokens();
-
-    // For now, just print the tokens.
-    for (Token* token : tokens) {
-        printf("%s \n", (token->toString()).c_str());
-    }
-    delete scannerObj;
+    shared_ptr<Scanner> scannerObj(new Scanner(source));
+    vector<Token> tokens = scannerObj->scanTokens();
+    shared_ptr<Parser> parser(new Parser(tokens));
+    shared_ptr<Expr> expression = parser->parse();
+    // Stop if there was a syntax error.
+    if (hadError) return;
+    // // For now, just print the tokens.
+    // for (Token* token : tokens) {
+    //     printf("%s \n", (token->toString()).c_str());
+    // }
+    shared_ptr<AstPrinter> astPrinter(new AstPrinter);
+    cout << astPrinter->print(expression) << endl;
 }

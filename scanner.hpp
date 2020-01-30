@@ -4,18 +4,18 @@
 #define SCANNER_HPP_
 
 #include <string>
-#include <list>
+#include <vector>
 #include <map>
 #include "./Token.hpp"
 
 using std::string;
-using std::list;
 using std::map;
+using std::vector;
 
 class Scanner {
  private:
     string source;
-    list<Token*> tokens;
+    vector<Token> tokens;
     static map<string, TokenType> keywords;
     int start = 0;
     int current = 0;
@@ -36,9 +36,8 @@ class Scanner {
 
  public:
     explicit Scanner(string source);
-    list<Token*> scanTokens();
+    vector<Token> scanTokens();
     bool isAtEnd();
-    ~Scanner();
 };
 
 #endif  // SCANNER_HPP_

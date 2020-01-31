@@ -68,14 +68,17 @@ void lox::report(int line, string where, string message) {
 void lox::run(string source) {
     shared_ptr<Scanner> scannerObj(new Scanner(source));
     vector<Token> tokens = scannerObj->scanTokens();
+    for (auto token : tokens) {
+        cout << token.toString() << endl;
+    }
     shared_ptr<Parser> parser(new Parser(tokens));
     shared_ptr<Expr> expression = parser->parse();
     // Stop if there was a syntax error.
     if (hadError) return;
-    // // For now, just print the tokens.
-    // for (Token* token : tokens) {
-    //     printf("%s \n", (token->toString()).c_str());
-    // }
-    shared_ptr<AstPrinter> astPrinter(new AstPrinter);
-    cout << astPrinter->print(expression) << endl;
+    if (expression == nullptr) {
+        cout << "no value" << endl;
+    } else {
+        shared_ptr<AstPrinter> astPrinter(new AstPrinter);
+        cout << astPrinter->print(expression) << endl;
+    }
 }

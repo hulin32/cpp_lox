@@ -2,13 +2,17 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "./Scanner.hpp"
 #include "./Token.hpp"
 #include "./lox.hpp"
 
 using std::string;
+using std::stod;
 using std::vector;
+using std::cout;
+using std::endl;
 
 map<string, TokenType> Scanner::keywords = {
     {"and", AND},
@@ -38,7 +42,7 @@ vector<Token> Scanner::scanTokens() {
       scanToken();
     }
 
-    Token token(TOKEN_EOF, "", "", line);
+    Token token(TOKEN_EOF, "", Object::make_str_obj(""), line);
     tokens.push_back(token);
     return tokens;
 }
@@ -49,6 +53,7 @@ bool Scanner::isAtEnd() {
 
 void Scanner::scanToken() {
     char c = advance();
+
     switch (c) {
         case '(': addToken(LEFT_PAREN); break;
         case ')': addToken(RIGHT_PAREN); break;
@@ -101,11 +106,11 @@ char Scanner::advance() {
 }
 
 void Scanner::addToken(TokenType type) {
-    addToken(type, "");
+    addToken(type, Object::make_str_obj(""));
 }
 
 void Scanner::addToken(TokenType type, Object literal) {
-    string text = source.substr(start, current);
+    string text = source.substr(start, current - start);
     Token token(type, text, literal, line);
     tokens.push_back(token);
 }
@@ -133,9 +138,8 @@ void Scanner::generateString() {
     advance();
 
     // Trim the surrounding quotes.
-    // TODO(hulin) may need to change
-    string value = source.substr(start + 1, current - 1);
-    addToken(STRING, "");
+    string value = source.substr(start, current - start);
+    addToken(STRING, Object::make_str_obj(value));
 }
 
 void Scanner::generateNumber() {
@@ -147,13 +151,14 @@ void Scanner::generateNumber() {
       advance();
       while (isDigit(peek())) advance();
     }
-    // TODO(hulin) double
-    addToken(NUMBER, source.substr(start, current));
+
+    double num = stod(source.substr(start, current - start));
+    addToken(NUMBER, Object::make_num_obj(num));
 }
 
 void Scanner::identifier() {
     while (isAlphaNumeric(peek())) advance();
-    string text = source.substr(start, current);
+    string text = source.substr(start, current - start);
     auto found = keywords.find(text);
     TokenType type;
     if (found != keywords.end()) {

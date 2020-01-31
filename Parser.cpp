@@ -96,7 +96,7 @@ shared_ptr<Expr> Parser::primary() {
     }
 
     if (match({ NUMBER, STRING })) {
-      return shared_ptr<Expr>(new Literal(previous().literal));
+      return shared_ptr<Expr>(new Literal(previous().literal.toString()));
     }
 
     if (match({ LEFT_PAREN })) {

@@ -1,7 +1,7 @@
 CXXFLAGS=-g -std=c++11 -Wall -pedantic
 CXX = g++
 
-all: main test
+all: main test demo
 
 lox.o:	lox.cpp lox.hpp
 Parser.o:	Parser.cpp Parser.hpp
@@ -12,6 +12,7 @@ AstPrinter.o: AstPrinter.hpp AstPrinter.cpp Expr.o
 
 main: main.cpp lox.o Token.o Scanner.o Parser.o AstPrinter.o Expr.o
 test: test.cpp Expr.o AstPrinter.o Token.o
+demo: demo.cpp
 
 clean:
 	rm -f *.o main

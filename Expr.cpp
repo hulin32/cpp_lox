@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include "./Expr.hpp"
-// #include "./token.hpp"
+#include "./Token.hpp"
 
 using std::string;
 using std::list;

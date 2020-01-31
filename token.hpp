@@ -28,7 +28,33 @@ typedef enum {
   TOKEN_EOF
 } TokenType;
 
-typedef string Object;
+struct Object {
+    typedef enum { Object_str, Object_num } Object_type;
+    string str;
+    double num;
+    Object_type type;
+    string toString() {
+      switch (type) {
+        case Object_str:
+          return str;
+        default:
+          return to_string(num);
+      }
+    }
+    static Object make_num_obj(double num) {
+      Object num_obj;
+      num_obj.type = Object::Object_num;
+      num_obj.num = num;
+      return num_obj;
+    }
+
+    static Object make_str_obj(string str) {
+      Object str_obj;
+      str_obj.type = Object::Object_str;
+      str_obj.str = str;
+      return str_obj;
+    }
+};
 
 class Token {
  public:
@@ -36,9 +62,8 @@ class Token {
     string toString();
     TokenType type;
     string lexeme;
-    string literal;
+    Object literal;
     int line;
 };
 
 #endif  // TOKEN_HPP_
-

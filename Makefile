@@ -3,7 +3,8 @@ CXX = g++
 
 all: main test demo
 
-lox.o:	lox.cpp lox.hpp
+Interpreter.o:	Interpreter.cpp Interpreter.hpp
+lox.o:	lox.cpp lox.hpp Interpreter.o
 Parser.o:	Parser.cpp Parser.hpp
 Scanner.o:	Scanner.cpp Scanner.hpp
 Token.o:	Token.cpp Token.hpp

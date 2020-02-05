@@ -4,10 +4,17 @@
 #define LOX_HPP_
 
 #include <string>
+#include "./RuntimeError.hpp"
+#include "./Interpreter.hpp"
 
 using std::string;
 
 class lox {
+ public:
+    static Interpreter interpreter;
+    static void error(int line, string message);
+    static int runScript(int argc, char const *argv[]);
+    static void runtimeError(RuntimeError error);
  private:
     static bool hadError;
     static bool hadRuntimeError;
@@ -15,9 +22,6 @@ class lox {
     static void runPrompt();
     static void run(string source);
     static void report(int line, string where, string message);
- public:
-    static void error(int line, string message);
-    static int runScript(int argc, char const *argv[]);
 };
 
 #endif  // LOX_HPP_

@@ -14,6 +14,7 @@
 #include "./AstPrinter.hpp"
 
 using std::string;
+using std::to_string;
 using std::stringstream;
 using std::ifstream;
 using std::cin;
@@ -78,7 +79,15 @@ void lox::run(string source) {
     if (expression == nullptr) {
         cout << "no value" << endl;
     } else {
+        interpreter.interpret(expression);
         // shared_ptr<AstPrinter> astPrinter(new AstPrinter);
         // cout << astPrinter->print(expression) << endl;
     }
 }
+
+void lox::runtimeError(RuntimeError error) {
+    cout << string(error.what())
+        + "\n[line " + to_string(error.token.line) + "]" << endl;
+    hadRuntimeError = true;
+}
+

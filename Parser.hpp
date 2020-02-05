@@ -20,17 +20,17 @@ using std::runtime_error;
 class Parser {
  public:
     explicit Parser(vector<Token> tokens_): tokens(tokens_) { }
-    shared_ptr<Expr> parse();
+    shared_ptr<Expr<Object>> parse();
  private:
     vector<Token> tokens;
     int current = 0;
-    shared_ptr<Expr> expression();
-    shared_ptr<Expr> equality();
-    shared_ptr<Expr> comparison();
-    shared_ptr<Expr> addition();
-    shared_ptr<Expr> multiplication();
-    shared_ptr<Expr> unary();
-    shared_ptr<Expr> primary();
+    shared_ptr<Expr<Object>> expression();
+    shared_ptr<Expr<Object>> equality();
+    shared_ptr<Expr<Object>> comparison();
+    shared_ptr<Expr<Object>> addition();
+    shared_ptr<Expr<Object>> multiplication();
+    shared_ptr<Expr<Object>> unary();
+    shared_ptr<Expr<Object>> primary();
     bool match(const initializer_list<TokenType> &types);
     bool check(TokenType type);
     Token advance();

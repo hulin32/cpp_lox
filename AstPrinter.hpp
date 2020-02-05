@@ -12,14 +12,14 @@
 using std::string;
 using std::shared_ptr;
 
-class AstPrinter: public Visitor, public std::enable_shared_from_this<AstPrinter> {
+class AstPrinter: public Visitor<string>, public std::enable_shared_from_this<AstPrinter> {
  public:
-    string print(shared_ptr<Expr> expr);
-    string visitLiteralExpr(const Literal& expr);
-    string visitAssignExpr(const Assign& expr);
-    string visitBinaryExpr(const Binary& expr);
-    string visitGroupingExpr(const Grouping& expr);
-    string visitUnaryExpr(const Unary& expr);
+    string print(shared_ptr<Expr<string>> expr);
+    string visitLiteralExpr(const Literal<string>& expr);
+    string visitAssignExpr(const Assign<string>& expr);
+    string visitBinaryExpr(const Binary<string>& expr);
+    string visitGroupingExpr(const Grouping<string>& expr);
+    string visitUnaryExpr(const Unary<string>& expr);
    //  string visitCallExpr(const Call& expr);
    //  string visitGetExpr(const Get& expr);
    //  string visitLogicalExpr(const Logical& expr);

@@ -7,11 +7,10 @@ lox.o:	lox.cpp lox.hpp
 Parser.o:	Parser.cpp Parser.hpp
 Scanner.o:	Scanner.cpp Scanner.hpp
 Token.o:	Token.cpp Token.hpp
-Expr.o: Expr.hpp Expr.cpp
-AstPrinter.o: AstPrinter.hpp AstPrinter.cpp Expr.o
+AstPrinter.o: AstPrinter.hpp AstPrinter.cpp
 
-main: main.cpp lox.o Token.o Scanner.o Parser.o AstPrinter.o Expr.o
-test: test.cpp Expr.o AstPrinter.o Token.o
+main: main.cpp lox.o Token.o Scanner.o Parser.o AstPrinter.o
+test: test.cpp AstPrinter.o Token.o
 demo: demo.cpp
 
 clean:

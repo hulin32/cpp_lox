@@ -72,13 +72,13 @@ void lox::run(string source) {
         cout << token.toString() << endl;
     }
     shared_ptr<Parser> parser(new Parser(tokens));
-    shared_ptr<Expr> expression = parser->parse();
+    shared_ptr<Expr<Object>> expression = parser->parse();
     // Stop if there was a syntax error.
     if (hadError) return;
     if (expression == nullptr) {
         cout << "no value" << endl;
     } else {
-        shared_ptr<AstPrinter> astPrinter(new AstPrinter);
-        cout << astPrinter->print(expression) << endl;
+        // shared_ptr<AstPrinter> astPrinter(new AstPrinter);
+        // cout << astPrinter->print(expression) << endl;
     }
 }

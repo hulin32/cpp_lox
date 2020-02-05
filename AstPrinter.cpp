@@ -14,16 +14,16 @@ using std::shared_ptr;
 using std::cout;
 using std::endl;
 
-string AstPrinter::print(shared_ptr<Expr> expr) {
+string AstPrinter::print(shared_ptr<Expr<string>> expr) {
     return expr->accept(shared_from_this());
 }
 
-string AstPrinter::visitLiteralExpr(const Literal& expr) {
+string AstPrinter::visitLiteralExpr(const Literal<string>& expr) {
     if (expr.value == "") return "nil";
     return expr.value;
 }
 
-string AstPrinter::visitAssignExpr(const Assign& expr) {
+string AstPrinter::visitAssignExpr(const Assign<string>& expr) {
     return "(" +
         expr.name.lexeme +
         " " +
@@ -31,7 +31,7 @@ string AstPrinter::visitAssignExpr(const Assign& expr) {
         " )";
 }
 
-string AstPrinter::visitBinaryExpr(const Binary& expr) {
+string AstPrinter::visitBinaryExpr(const Binary<string>& expr) {
     return "(" +
         expr.operation.lexeme +
         " " +
@@ -41,13 +41,13 @@ string AstPrinter::visitBinaryExpr(const Binary& expr) {
         ")";
 }
 
-string AstPrinter::visitGroupingExpr(const Grouping& expr) {
+string AstPrinter::visitGroupingExpr(const Grouping<string>& expr) {
     return "(group " +
         expr.expression->accept(shared_from_this()) +
         ")";
 }
 
-string AstPrinter::visitUnaryExpr(const Unary& expr) {
+string AstPrinter::visitUnaryExpr(const Unary<string>& expr) {
     return "("+
         expr.operation.lexeme +
         " " +

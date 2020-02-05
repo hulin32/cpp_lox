@@ -28,81 +28,81 @@ using std::runtime_error;
 using std::to_string;
 using std::vector;
 
-shared_ptr<Expr> Parser::expression() {
+shared_ptr<Expr<Object>> Parser::expression() {
     return equality();
 }
 
-shared_ptr<Expr> Parser::equality() {
-    shared_ptr<Expr> expr = comparison();
+shared_ptr<Expr<Object>> Parser::equality() {
+    shared_ptr<Expr<Object>> expr = comparison();
     while (match({ BANG_EQUAL, EQUAL_EQUAL })) {
       Token operation = previous();
-      shared_ptr<Expr> right = comparison();
-      expr = shared_ptr<Expr>(new Binary(expr, operation, right));
+      shared_ptr<Expr<Object>> right = comparison();
+      expr = shared_ptr<Expr<Object>>(new Binary<Object>(expr, operation, right));
     }
     return expr;
 }
 
-shared_ptr<Expr> Parser::comparison() {
-    shared_ptr<Expr> expr = addition();
+shared_ptr<Expr<Object>> Parser::comparison() {
+    shared_ptr<Expr<Object>> expr = addition();
 
     while (match({ GREATER, GREATER_EQUAL, LESS, LESS_EQUAL })) {
       Token operation = previous();
-      shared_ptr<Expr> right = addition();
-      expr = shared_ptr<Expr>(new Binary(expr, operation, right));
+      shared_ptr<Expr<Object>> right = addition();
+      expr = shared_ptr<Expr<Object>>(new Binary<Object>(expr, operation, right));
     }
     return expr;
 }
 
-shared_ptr<Expr> Parser::addition() {
-    shared_ptr<Expr> expr = multiplication();
+shared_ptr<Expr<Object>> Parser::addition() {
+    shared_ptr<Expr<Object>> expr = multiplication();
 
     while (match({ MINUS, PLUS })) {
       Token operation = previous();
-      shared_ptr<Expr> right = multiplication();
-      expr = shared_ptr<Expr>(new Binary(expr, operation, right));
+      shared_ptr<Expr<Object>> right = multiplication();
+      expr = shared_ptr<Expr<Object>>(new Binary<Object>(expr, operation, right));
     }
     return expr;
 }
-shared_ptr<Expr> Parser::multiplication() {
-    shared_ptr<Expr> expr = unary();
+shared_ptr<Expr<Object>> Parser::multiplication() {
+    shared_ptr<Expr<Object>> expr = unary();
 
     while (match({ SLASH, STAR })) {
       Token operation = previous();
-      shared_ptr<Expr> right = unary();
-      expr = shared_ptr<Expr>(new Binary(expr, operation, right));
+      shared_ptr<Expr<Object>> right = unary();
+      expr = shared_ptr<Expr<Object>>(new Binary<Object>(expr, operation, right));
     }
 
     return expr;
 }
 
-shared_ptr<Expr> Parser::unary() {
+shared_ptr<Expr<Object>> Parser::unary() {
     if (match({ BANG, MINUS })) {
       Token operation = previous();
-      shared_ptr<Expr> right = unary();
-      return shared_ptr<Expr>(new Unary(operation, right));
+      shared_ptr<Expr<Object>> right = unary();
+      return shared_ptr<Expr<Object>>(new Unary<Object>(operation, right));
     }
     return primary();
 }
 
-shared_ptr<Expr> Parser::primary() {
+shared_ptr<Expr<Object>> Parser::primary() {
     if (match({ FALSE })) {
-        return shared_ptr<Expr>(new Literal("false"));
+        return shared_ptr<Expr<Object>>(new Literal<Object>("false"));
     }
     if (match({ TRUE })) {
-        return shared_ptr<Expr>(new Literal("true"));
+        return shared_ptr<Expr<Object>>(new Literal<Object>("true"));
     }
     if (match({ NIL })) {
-        return shared_ptr<Expr>(new Literal(""));
+        return shared_ptr<Expr<Object>>(new Literal<Object>(""));
     }
 
     if (match({ NUMBER, STRING })) {
-      return shared_ptr<Expr>(new Literal(previous().literal.toString()));
+      return shared_ptr<Expr<Object>>(new Literal<Object>(previous().literal.toString()));
     }
 
     if (match({ LEFT_PAREN })) {
-      shared_ptr<Expr> expr = expression();
+      shared_ptr<Expr<Object>> expr = expression();
       consume(RIGHT_PAREN, "Expect ')' after expression.");
-      return shared_ptr<Expr>(new Grouping(expr));
+      return shared_ptr<Expr<Object>>(new Grouping<Object>(expr));
     }
     throw error(peek(), "Expect expression.");
 }
@@ -175,7 +175,7 @@ void Parser::synchronize() {
     }
 }
 
-shared_ptr<Expr> Parser::parse() {
+shared_ptr<Expr<Object>> Parser::parse() {
   try {
     return expression();
   } catch (runtime_error error) {

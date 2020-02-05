@@ -4,6 +4,7 @@
 #define EXPR_HPP_
 
 #include <string>
+#include <iostream>
 #include <list>
 #include <memory>
 #include "./Token.hpp"
@@ -11,21 +12,33 @@
 using std::list;
 using std::string;
 using std::shared_ptr;
+using std::cout;
+using std::endl;
 
+template<class R>
 class Literal;
+
+template<class R>
 class Assign;
+
+template<class R>
 class Binary;
+
+template<class R>
 class Grouping;
+
+template<class R>
 class Unary;
 
+template <class R>
 class Visitor {
  public:
     virtual ~Visitor() = default;
-    virtual string visitLiteralExpr(const Literal& expr) = 0;
-    virtual string visitAssignExpr(const Assign& expr) = 0;
-    virtual string visitBinaryExpr(const Binary& expr) = 0;
-    virtual string visitGroupingExpr(const Grouping& expr) = 0;
-    virtual string visitUnaryExpr(const Unary& expr) = 0;
+    virtual R visitLiteralExpr(const Literal<R>& expr) = 0;
+    virtual R visitAssignExpr(const Assign<R>& expr) = 0;
+    virtual R visitBinaryExpr(const Binary<R>& expr) = 0;
+    virtual R visitGroupingExpr(const Grouping<R>& expr) = 0;
+    virtual R visitUnaryExpr(const Unary<R>& expr) = 0;
     // virtual string visitCallExpr(const Call& expr) = 0;
     // virtual string visitSetExpr(const Set& expr) = 0;
     // virtual string visitSuperExpr(const Super& expr) = 0;
@@ -33,103 +46,157 @@ class Visitor {
     // virtual string visitVariableExpr(const Variable& expr) = 0;
 };
 
+template<class R>
 class Expr {
  public:
-    virtual string accept(shared_ptr<Visitor> visitor) = 0;
-    virtual ~Expr() = default;
+    virtual R accept(shared_ptr<Visitor<R>> visitor) = 0;
+    virtual ~Expr() = default;  // for derived class
 };
 
-class Literal: public Expr {
+template<class R>
+class Literal: public Expr<R> {
  public:
-    explicit Literal(string value_);
-    string accept(shared_ptr<Visitor> visitor) override;
+    explicit Literal(string value_): value(value_) { }
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+        return visitor->visitLiteralExpr(*this);
+    }
     string value;
 };
 
-class Assign: public Expr {
+template <class R>
+class Assign: public Expr<R> {
  public:
-    Assign(Token name, shared_ptr<Expr> value);
-    string accept(shared_ptr<Visitor> visitor) override;
+    Assign(Token name_, shared_ptr<Expr<R>> value_):
+    name(name_), value(value_) {}
+
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+        return visitor->visitAssignExpr(*this);
+    }
     Token name;
-    shared_ptr<Expr> value;
+    shared_ptr<Expr<R>> value;
 };
 
-class Binary: public Expr {
+template <class R>
+class Binary: public Expr<R> {
  public:
-    Binary(shared_ptr<Expr> left, Token operation, shared_ptr<Expr> right);
-    string accept(shared_ptr<Visitor> visitor) override;
-    shared_ptr<Expr> left;
+    Binary(
+        shared_ptr<Expr<R>> left_,
+        Token operation,
+        shared_ptr<Expr<R>> right_
+    ): left(left_), operation(operation), right(right_) { }
+
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+      return visitor->visitBinaryExpr(*this);
+    }
+    shared_ptr<Expr<R>> left;
     Token operation;
-    shared_ptr<Expr> right;
+    shared_ptr<Expr<R>> right;
 };
 
-class Grouping: public Expr {
+template <class R>
+class Grouping: public Expr<R> {
  public:
-    explicit Grouping(shared_ptr<Expr> expression);
-    string accept(shared_ptr<Visitor> visitor) override;
-    shared_ptr<Expr> expression;
+    explicit Grouping(shared_ptr<Expr<R>> expression_):
+    expression(expression_) { }
+
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+        return visitor->visitGroupingExpr(*this);
+    }
+    shared_ptr<Expr<R>> expression;
 };
 
-class Unary: public Expr {
+template <class R>
+class Unary: public Expr<R> {
  public:
-    Unary(Token operation, shared_ptr<Expr> right);
-    string accept(shared_ptr<Visitor> visitor) override;
+    Unary(Token operation, shared_ptr<Expr<R>> right_):
+    operation(operation), right(right_) { }
+
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+      return visitor->visitUnaryExpr(*this);
+    }
     Token operation;
-    shared_ptr<Expr> right;
+    shared_ptr<Expr<R>> right;
 };
 
-// class Call: public Expr {
+// template <class R>
+// class Call: public Expr<R> {
 //  public:
-//     Call(unique_ptr<Expr> callee, Token paren, list<unique_ptr<Expr>> arguments);
+//     Call(
+//         shared_ptr<Expr<R>> callee_,
+//         Token paren_,
+//         list<shared_ptr<Expr<R>>> arguments_
+//     ): callee(callee_), paren(paren_), arguments(arguments_){ }
+//     R accept(shared_ptr<Visitor<R>> visitor) override {
+//       return visitor->visitCallExpr(*this);
+//     }
+//     shared_ptr<Expr<R>> callee;
 //     Token paren;
-//     list<unique_ptr<Expr>> arguments;
+//     list<shared_ptr<Expr<R>>> arguments;
 // };
 
-// class Get: public Expr {
+// template <class R>
+// class Get: public Expr<R> {
 //  public:
-//     Get(unique_ptr<Expr> object, Token name);
-//     string accept(unique_ptr<Visitor> visitor) override;
+//     Get(shared_ptr<Expr<R>> object, Token name);
+//     R accept(shared_ptr<Visitor<R>> visitor) override {
+//       return visitor->visitGetExpr(*this);
+//     }
 //     Token name;
-//     unique_ptr<Expr> object;
+//     shared_ptr<Expr<R>> object;
 // };
 
-// class Logical: public Expr {
+// template <class R>
+// class Logical: public Expr<R> {
 //  public:
-//     Logical(unique_ptr<Expr> left, Token operation, unique_ptr<Expr> right);
-//     string accept(unique_ptr<Visitor> visitor) override;
-//     unique_ptr<Expr> left;
+//     Logical(shared_ptr<Expr<R>> left, Token operation, shared_ptr<Expr<R>> right);
+//     R accept(shared_ptr<Visitor<R>> visitor) override {
+//         return visitor->visitLogicalExpr(*this);
+//     };
+//     shared_ptr<Expr<R>> left;
 //     Token operation;
-//     unique_ptr<Expr> right;
+//     shared_ptr<Expr<R>> right;
 // };
 
-// class Set: public Expr {
+// template <class R>
+// class Set: public Expr<R> {
 //  public:
-//     Set(unique_ptr<Expr> object, Token name, unique_ptr<Expr> value);
-//     string accept(unique_ptr<Visitor> visitor) override;
-//     unique_ptr<Expr> object;
+//     Set(shared_ptr<Expr<R>> object, Token name, shared_ptr<Expr<R>> value);
+//     R accept(shared_ptr<Visitor<R>> visitor) override {
+//         return visitor->visitSetExpr(*this);
+//     };
+//     shared_ptr<Expr<R>> object;
 //     Token name;
-//     unique_ptr<Expr> value;
+//     shared_ptr<Expr<R>> value;
 // };
 
-// class Super: public Expr {
+// template <class R>
+// class Super: public Expr<R> {
 //  public:
 //     Super(Token keyword, Token method);
-//     string accept(unique_ptr<Visitor> visitor) override;
+//     R accept(shared_ptr<Visitor<R>> visitor) override {
+//         return visitor->visitSuperExpr(*this);
+//     };
 //     Token keyword;
 //     Token method;
 // };
 
-// class This : public Expr{
+// template <class R>
+// class This : public Expr<R>{
 //  public:
 //     explicit This(Token keyword);
-//     string accept(unique_ptr<Visitor> visitor) override;
+//     R accept(shared_ptr<Visitor<R>> visitor) override {
+//         return visitor->visitThisExpr(*this);
+//     };
 //     Token keyword;
 // };
 
-// class Variable: public Expr {
+// template <class R>
+// class Variable: public Expr<R> {
 //  public:
 //     explicit Variable(Token name);
-//     string accept(unique_ptr<Visitor> visitor) override;
+//     R accept(shared_ptr<Visitor<R>> visitor) override {
+//         return visitor->visitVariableExpr(*this);
+//     };
 //     Token name;
 // };
 

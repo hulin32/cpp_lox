@@ -29,12 +29,18 @@ typedef enum {
 } TokenType;
 
 struct Object {
-    typedef enum { Object_str, Object_num } Object_type;
+    typedef enum { Object_str, Object_num, Object_bool, Object_nil } Object_type;
     string str;
     double num;
+    bool boolean;
+    int* nil;
     Object_type type;
     string toString() {
       switch (type) {
+        case Object_nil:
+          return "nil";
+        case Object_bool:
+          return boolean ? "1" : "0";
         case Object_str:
           return str;
         default:
@@ -53,6 +59,20 @@ struct Object {
       str_obj.type = Object::Object_str;
       str_obj.str = str;
       return str_obj;
+    }
+
+    static Object make_bool_obj(bool boolean) {
+      Object bool_obj;
+      bool_obj.type = Object::Object_num;
+      bool_obj.boolean = boolean;
+      return bool_obj;
+    }
+
+    static Object make_nil_obj() {
+      Object nil_obj;
+      nil_obj.type = Object::Object_nil;
+      nil_obj.nil = NULL;
+      return nil_obj;
     }
 };
 

@@ -56,11 +56,11 @@ class Expr {
 template<class R>
 class Literal: public Expr<R> {
  public:
-    explicit Literal(string value_): value(value_) { }
+    explicit Literal(R value_): value(value_) { }
     R accept(shared_ptr<Visitor<R>> visitor) override {
         return visitor->visitLiteralExpr(*this);
     }
-    string value;
+    R value;
 };
 
 template <class R>

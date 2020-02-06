@@ -16,6 +16,7 @@ using std::shared_ptr;
 using std::cout;
 using std::endl;
 
+
 void Interpreter::interpret(shared_ptr<Expr<Object>> expression) {
     try {
         Object value = evaluate(expression);
@@ -25,14 +26,33 @@ void Interpreter::interpret(shared_ptr<Expr<Object>> expression) {
     }
 }
 
+bool endsWith(std::string str, std::string suffix) {
+    if (str.length() < suffix.length())
+        return false;
+    return str.substr(str.length() - suffix.length()) == suffix;
+}
+
 string Interpreter::stringify(Object object) {
-    return object.toString();
+    string text = object.toString();
+    string check_str = ".000000";
+    if (endsWith(text, check_str)) {
+        return text.erase(text.size() - check_str.size());
+    }
+    return text;
 }
 
 
 Object Interpreter::visitLiteralExpr(const Literal<Object>& expr) {
-    if (expr.value == "") return Object::make_nil_obj();
-    return Object::make_str_obj(expr.value);
+    switch (expr.value.type) {
+        case Object::Object_bool:
+            return Object::make_bool_obj(expr.value.boolean);
+        case Object::Object_nil:
+            return Object::make_nil_obj();
+        case Object::Object_num:
+            return Object::make_num_obj(expr.value.num);
+        default:
+            return Object::make_str_obj(expr.value.str);
+    }
 }
 
 Object Interpreter::visitGroupingExpr(const Grouping<Object>& expr) {

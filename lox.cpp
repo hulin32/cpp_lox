@@ -71,9 +71,9 @@ void lox::report(int line, string where, string message) {
 void lox::run(string source) {
     shared_ptr<Scanner> scannerObj(new Scanner(source));
     vector<Token> tokens = scannerObj->scanTokens();
-    for (auto token : tokens) {
-        cout << token.toString() << endl;
-    }
+    // for (auto token : tokens) {
+        // cout << token.toString() << endl;
+    // }
     shared_ptr<Parser> parser(new Parser(tokens));
     shared_ptr<Expr<Object>> expression = parser->parse();
     // Stop if there was a syntax error.

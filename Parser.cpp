@@ -86,17 +86,25 @@ shared_ptr<Expr<Object>> Parser::unary() {
 
 shared_ptr<Expr<Object>> Parser::primary() {
     if (match({ FALSE })) {
-        return shared_ptr<Expr<Object>>(new Literal<Object>("false"));
+        return shared_ptr<Expr<Object>>(
+          new Literal<Object>(Object::make_bool_obj(false)));
     }
     if (match({ TRUE })) {
-        return shared_ptr<Expr<Object>>(new Literal<Object>("true"));
+        return shared_ptr<Expr<Object>>(
+          new Literal<Object>(Object::make_bool_obj(true)));
     }
     if (match({ NIL })) {
-        return shared_ptr<Expr<Object>>(new Literal<Object>(""));
+        return shared_ptr<Expr<Object>>(
+          new Literal<Object>(Object::make_nil_obj()));
     }
 
-    if (match({ NUMBER, STRING })) {
-      return shared_ptr<Expr<Object>>(new Literal<Object>(previous().literal.toString()));
+    if (match({ NUMBER })) {
+      return shared_ptr<Expr<Object>>(
+        new Literal<Object>(Object::make_num_obj(previous().literal.num)));
+    }
+    if (match({ STRING })) {
+      return shared_ptr<Expr<Object>>(
+        new Literal<Object>(Object::make_str_obj(previous().literal.str)));
     }
 
     if (match({ LEFT_PAREN })) {

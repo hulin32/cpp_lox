@@ -111,7 +111,7 @@ Object Interpreter::visitBinaryExpr(const Binary<Object>& expr) {
             result_str = left.toString() + right.toString();
             return Object::make_str_obj(result_str);
         }
-         throw new RuntimeError(expr.operation,
+         throw RuntimeError(expr.operation,
             "Operands must be two numbers or two strings.");
       case SLASH:
         checkNumberOperands(expr.operation, left, right);

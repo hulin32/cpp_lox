@@ -138,7 +138,7 @@ void Scanner::generateString() {
     advance();
 
     // Trim the surrounding quotes.
-    string value = source.substr(start, current - start);
+    string value = source.substr(start + 1, current - start - 2);
     addToken(STRING, Object::make_str_obj(value));
 }
 

@@ -8,9 +8,15 @@ using std::shared_ptr;
 using std::cout;
 using std::endl;
 
+class Foo {
+ public:
+    int foo;
+    int hello () { return 100; }
+};
+
 int main(int argc, char const *argv[])
 {
-    string t = "1";
-    cout << stod(t) << endl;
+    Foo foo;
+    cout << foo.hello() << endl;
     return 0;
 }

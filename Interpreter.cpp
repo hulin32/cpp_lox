@@ -107,6 +107,10 @@ Object Interpreter::visitBinaryExpr(const Binary<Object>& expr) {
     }
 }
 
+Object Interpreter::visitAssignExpr(const Assign<Object>& expr) {
+    return Object::make_nil_obj();
+}
+
 
 Object Interpreter::evaluate(shared_ptr<Expr<Object>> expr) {
     return expr->accept(shared_from_this());

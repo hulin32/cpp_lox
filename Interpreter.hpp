@@ -18,14 +18,13 @@ class Interpreter:
     public std::enable_shared_from_this<Interpreter>
 {
  public:
-    Interpreter() {}
     void interpret(shared_ptr<Expr<Object>> expression);
- private:
     Object visitLiteralExpr(const Literal<Object>& expr);
     Object visitAssignExpr(const Assign<Object>& expr);
     Object visitBinaryExpr(const Binary<Object>& expr);
     Object visitGroupingExpr(const Grouping<Object>& expr);
     Object visitUnaryExpr(const Unary<Object>& expr);
+ private:
     Object evaluate(shared_ptr<Expr<Object>> expr);
     bool isTruthy(Object object);
     bool isEqual(Object a, Object b);

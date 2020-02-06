@@ -11,7 +11,6 @@ using std::string;
 
 class lox {
  public:
-    static Interpreter interpreter;
     static void error(int line, string message);
     static int runScript(int argc, char const *argv[]);
     static void runtimeError(RuntimeError error);

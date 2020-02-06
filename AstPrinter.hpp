@@ -12,7 +12,9 @@
 using std::string;
 using std::shared_ptr;
 
-class AstPrinter: public Visitor<string>, public std::enable_shared_from_this<AstPrinter> {
+class AstPrinter:
+    public Visitor<string>,
+    public std::enable_shared_from_this<AstPrinter> {
  public:
     string print(shared_ptr<Expr<string>> expr);
     string visitLiteralExpr(const Literal<string>& expr);

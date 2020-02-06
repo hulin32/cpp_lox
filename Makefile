@@ -10,7 +10,7 @@ Scanner.o:	Scanner.cpp Scanner.hpp
 Token.o:	Token.cpp Token.hpp
 AstPrinter.o: AstPrinter.hpp AstPrinter.cpp
 
-main: main.cpp lox.o Token.o Scanner.o Parser.o AstPrinter.o
+main: main.cpp lox.o Token.o Scanner.o Parser.o AstPrinter.o Interpreter.o
 test: test.cpp AstPrinter.o Token.o
 demo: demo.cpp
 

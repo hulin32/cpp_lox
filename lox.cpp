@@ -12,6 +12,8 @@
 #include "./Parser.hpp"
 #include "./Expr.hpp"
 #include "./AstPrinter.hpp"
+#include "./Interpreter.hpp"
+
 
 using std::string;
 using std::to_string;
@@ -79,7 +81,8 @@ void lox::run(string source) {
     if (expression == nullptr) {
         cout << "no value" << endl;
     } else {
-        interpreter.interpret(expression);
+        shared_ptr<Interpreter> interpreter(new Interpreter());
+        interpreter->interpret(expression);
         // shared_ptr<AstPrinter> astPrinter(new AstPrinter);
         // cout << astPrinter->print(expression) << endl;
     }

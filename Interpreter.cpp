@@ -27,8 +27,9 @@ void Interpreter::interpret(shared_ptr<Expr<Object>> expression) {
 }
 
 bool endsWith(std::string str, std::string suffix) {
-    if (str.length() < suffix.length())
+    if (str.length() < suffix.length()) {
         return false;
+    }
     return str.substr(str.length() - suffix.length()) == suffix;
 }
 

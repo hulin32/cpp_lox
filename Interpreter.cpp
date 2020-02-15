@@ -178,6 +178,12 @@ void Interpreter::visitBlockStmt(const Block& stmt) {
     executeBlock(stmt.statements, env);
 }
 
+void Interpreter::visitWhileStmt(const While& stmt) {
+    while (isTruthy(evaluate(stmt.condition))) {
+      execute(stmt.body);
+    }
+}
+
 void Interpreter::visitIfStmt(const If& stmt) {
     if (isTruthy(evaluate(stmt.condition))) {
       execute(stmt.thenBranch);

@@ -85,6 +85,9 @@ shared_ptr<Stmt> Parser::statement() {
   if (match({ PRINT })) {
     return printStatement();
   }
+  if (match({ WHILE })) {
+    return whileStatement();
+  }
   if (match({ LEFT_BRACE })) {
     return shared_ptr<Stmt>(new Block(block()));
   }
@@ -108,6 +111,14 @@ shared_ptr<Stmt> Parser::printStatement() {
   consume(SEMICOLON, "Expect ';' after value.");
   shared_ptr<Stmt> print(new Print(value));
   return print;
+}
+
+shared_ptr<Stmt> Parser::whileStatement() {
+    consume(LEFT_PAREN, "Expect '(' after 'while'.");
+    shared_ptr<Expr<Object>> condition = expression();
+    consume(RIGHT_PAREN, "Expect ')' after condition.");
+    shared_ptr<Stmt> body = statement();
+    return shared_ptr<Stmt>(new While(condition, body));
 }
 
 shared_ptr<Stmt> Parser::expressionStatement() {

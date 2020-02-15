@@ -36,6 +36,7 @@ class Interpreter:
     void visitVarStmt(const Var& stmt);
     void visitBlockStmt(const Block& stmt);
     void visitIfStmt(const If& stmt);
+    void visitWhileStmt(const While& stmt);
  private:
     shared_ptr<Environment> environment
       = shared_ptr<Environment>(new Environment());

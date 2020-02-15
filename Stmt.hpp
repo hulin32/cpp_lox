@@ -9,7 +9,10 @@ declaration → varDecl
 statement → exprStmt
           | ifStmt
           | printStmt
+          | whileStmt
           | block ;
+
+whileStmt → "while" "(" expression ")" statement ;
 
 ifStmt    → "if" "(" expression ")" statement ( "else" statement )? ;
 
@@ -43,6 +46,7 @@ class Print;
 class Var;
 class Block;
 class If;
+class While;
 
 class Visitor_Stmt {
  public:
@@ -52,6 +56,7 @@ class Visitor_Stmt {
     virtual void visitVarStmt(const Var& stmt) = 0;
     virtual void visitBlockStmt(const Block& stmt) = 0;
     virtual void visitIfStmt(const If& stmt) = 0;
+    virtual void visitWhileStmt(const While& stmt) = 0;
 };
 
 class Stmt {
@@ -118,6 +123,20 @@ class If: public Stmt {
     shared_ptr<Expr<Object>> condition;
     shared_ptr<Stmt> thenBranch;
     shared_ptr<Stmt> elseBranch;
+};
+
+class While: public Stmt {
+ public:
+    While(
+        shared_ptr<Expr<Object>> condition_,
+        shared_ptr<Stmt> body_):
+        condition(condition_),
+        body(body_) { }
+    void accept(shared_ptr<Visitor_Stmt> visitor) override {
+        visitor->visitWhileStmt(*this);
+    }
+    shared_ptr<Expr<Object>> condition;
+    shared_ptr<Stmt> body;
 };
 
 #endif  // STMT_HPP_

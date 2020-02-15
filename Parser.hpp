@@ -46,6 +46,7 @@ class Parser {
     void synchronize();
     shared_ptr<Stmt> statement();
     shared_ptr<Stmt> ifStatement();
+    shared_ptr<Stmt> whileStatement();
     shared_ptr<Stmt> printStatement();
     shared_ptr<Stmt> expressionStatement();
     shared_ptr<Stmt> declaration();

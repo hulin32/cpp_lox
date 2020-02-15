@@ -33,10 +33,15 @@ class Interpreter:
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
+    void visitBlockStmt(const Block& stmt);
  private:
-    Environment environment;
+    shared_ptr<Environment> environment
+      = shared_ptr<Environment>(new Environment());
     Object evaluate(shared_ptr<Expr<Object>> expr);
     void execute(shared_ptr<Stmt> stmt);
+    void executeBlock(
+        vector<shared_ptr<Stmt>> statements,
+        shared_ptr<Environment> environment);
     bool isTruthy(Object object);
     bool isEqual(Object a, Object b);
     void checkNumberOperand(Token operation, Object operand);

@@ -7,7 +7,10 @@ declaration → varDecl
             | statement ;
 
 statement   → exprStmt
-            | printStmt ;
+            | printStmt
+            | block ;
+
+block     → "{" declaration* "}" ;
 
 primary → "true" | "false" | "nil"
         | NUMBER | STRING
@@ -22,6 +25,7 @@ varDecl → "var" IDENTIFIER ( "=" expression )? ";" ;
 #include <string>
 #include <iostream>
 #include <memory>
+#include <vector>
 #include "./Token.hpp"
 #include "./Expr.hpp"
 
@@ -29,10 +33,12 @@ using std::string;
 using std::shared_ptr;
 using std::cout;
 using std::endl;
+using std::vector;
 
 class Expression;
 class Print;
 class Var;
+class Block;
 
 class Visitor_Stmt {
  public:
@@ -40,6 +46,7 @@ class Visitor_Stmt {
     virtual void visitExpressionStmt(const Expression& stmt) = 0;
     virtual void visitPrintStmt(const Print& stmt) = 0;
     virtual void visitVarStmt(const Var& stmt) = 0;
+    virtual void visitBlockStmt(const Block& stmt) = 0;
 };
 
 class Stmt {
@@ -79,6 +86,16 @@ class Var: public Stmt {
     }
     shared_ptr<Expr<Object>> initializer;
     Token name;
+};
+
+class Block: public Stmt {
+ public:
+    explicit Block(vector<shared_ptr<Stmt>> statements_):
+        statements(statements_) { }
+    void accept(shared_ptr<Visitor_Stmt> visitor) override {
+        visitor->visitBlockStmt(*this);
+    }
+    vector<shared_ptr<Stmt>> statements;
 };
 
 #endif  // STMT_HPP_

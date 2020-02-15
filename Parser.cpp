@@ -59,6 +59,9 @@ shared_ptr<Stmt> Parser::statement() {
   if (match({ PRINT })) {
     return printStatement();
   }
+  if (match({ LEFT_BRACE })) {
+    return shared_ptr<Stmt>(new Block(block()));
+  }
   return expressionStatement();
 }
 
@@ -74,6 +77,16 @@ shared_ptr<Stmt> Parser::expressionStatement() {
   consume(SEMICOLON, "Expect ';' after expression.");
   shared_ptr<Stmt> expression(new Expression(expr));
   return expression;
+}
+
+vector<shared_ptr<Stmt>> Parser::block() {
+    vector<shared_ptr<Stmt>> statements;
+
+    while (!check({ RIGHT_BRACE }) && !isAtEnd()) {
+      statements.push_back(declaration());
+    }
+    consume(RIGHT_BRACE, "Expect '}' after block.");
+    return statements;
 }
 
 shared_ptr<Expr<Object>> Parser::equality() {

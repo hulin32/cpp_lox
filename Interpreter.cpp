@@ -5,19 +5,23 @@
 #include <memory>
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 
 #include "./Interpreter.hpp"
 #include "./Expr.hpp"
 #include "./Token.hpp"
 #include "./Stmt.hpp"
 #include "./RuntimeError.hpp"
+#include "./Environment.hpp"
 #include "./lox.hpp"
 
 using std::stod;
 using std::shared_ptr;
+using std::make_shared;
 using std::cout;
 using std::endl;
 using std::vector;
+using std::exception;
 
 bool endsWith(std::string str, std::string suffix) {
     if (str.length() < suffix.length()) {
@@ -133,12 +137,12 @@ Object Interpreter::visitBinaryExpr(const Binary<Object>& expr) {
 
 Object Interpreter::visitAssignExpr(const Assign<Object>& expr) {
     Object value = evaluate(expr.value);
-    environment.assign(expr.name, value);
+    environment->assign(expr.name, value);
     return value;
 }
 
 Object Interpreter::visitVariableExpr(const Variable<Object>& expr) {
-    return environment.get(expr.name);
+    return environment->get(expr.name);
 }
 
 void Interpreter::visitExpressionStmt(const Expression& stmt) {
@@ -156,7 +160,12 @@ void Interpreter::visitVarStmt(const Var& stmt) {
     if (stmt.initializer != nullptr) {
       value = evaluate(stmt.initializer);
     }
-    environment.define(stmt.name.lexeme, value);
+    environment->define(stmt.name.lexeme, value);
+}
+
+void Interpreter::visitBlockStmt(const Block& stmt) {
+    shared_ptr<Environment> env(new Environment(environment));
+    executeBlock(stmt.statements, env);
 }
 
 Object Interpreter::evaluate(shared_ptr<Expr<Object>> expr) {
@@ -166,6 +175,22 @@ Object Interpreter::evaluate(shared_ptr<Expr<Object>> expr) {
 void Interpreter::execute(shared_ptr<Stmt> stmt) {
     stmt->accept(shared_from_this());
 }
+
+void Interpreter::executeBlock(
+    vector<shared_ptr<Stmt>> statements,
+    shared_ptr<Environment> env
+) {
+    shared_ptr<Environment> previous = environment;
+    try {
+      environment = env;
+      for (auto statement : statements) {
+        execute(statement);
+      }
+      environment = previous;
+    } catch(exception e) {
+      environment = previous;
+    }
+  }
 
 bool Interpreter::isTruthy(Object object) {
     if (object.type == Object::Object_nil) {

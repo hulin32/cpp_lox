@@ -135,6 +135,10 @@ Object Interpreter::visitAssignExpr(const Assign<Object>& expr) {
     return Object::make_nil_obj();
 }
 
+Object Interpreter::visitVariableExpr(const Variable<Object>& expr) {
+    return environment.get(expr.name);
+}
+
 void Interpreter::visitExpressionStmt(const Expression& stmt) {
     evaluate(stmt.expression);
 }
@@ -142,6 +146,15 @@ void Interpreter::visitExpressionStmt(const Expression& stmt) {
 void Interpreter::visitPrintStmt(const Print& stmt) {
     Object value = evaluate(stmt.expression);
     cout << stringify(value) << endl;
+}
+
+void Interpreter::visitVarStmt(const Var& stmt) {
+    // cout << stringify(value) << endl;
+    Object value = Object::make_nil_obj();
+    if (stmt.initializer != nullptr) {
+      value = evaluate(stmt.initializer);
+    }
+    environment.define(stmt.name.lexeme, value);
 }
 
 Object Interpreter::evaluate(shared_ptr<Expr<Object>> expr) {

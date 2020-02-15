@@ -1,5 +1,21 @@
 // Copyright 2020 <Copyright hulin>
 
+/*
+program     → declaration* EOF ;
+
+declaration → varDecl
+            | statement ;
+
+statement   → exprStmt
+            | printStmt ;
+
+primary → "true" | "false" | "nil"
+        | NUMBER | STRING
+        | "(" expression ")"
+        | IDENTIFIER ;
+varDecl → "var" IDENTIFIER ( "=" expression )? ";" ;
+*/
+
 #ifndef STMT_HPP_
 #define STMT_HPP_
 
@@ -16,12 +32,14 @@ using std::endl;
 
 class Expression;
 class Print;
+class Var;
 
 class Visitor_Stmt {
  public:
     virtual ~Visitor_Stmt() = default;
     virtual void visitExpressionStmt(const Expression& stmt) = 0;
     virtual void visitPrintStmt(const Print& stmt) = 0;
+    virtual void visitVarStmt(const Var& stmt) = 0;
 };
 
 class Stmt {
@@ -50,6 +68,17 @@ class Print: public Stmt {
         visitor->visitPrintStmt(*this);
     }
     shared_ptr<Expr<Object>> expression;
+};
+
+class Var: public Stmt {
+ public:
+    explicit Var(Token name_, shared_ptr<Expr<Object>> initializer_):
+        initializer(initializer_), name(name_) { }
+    void accept(shared_ptr<Visitor_Stmt> visitor) override {
+        visitor->visitVarStmt(*this);
+    }
+    shared_ptr<Expr<Object>> initializer;
+    Token name;
 };
 
 #endif  // STMT_HPP_

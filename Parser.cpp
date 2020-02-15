@@ -129,6 +129,11 @@ shared_ptr<Expr<Object>> Parser::primary() {
         new Literal<Object>(Object::make_str_obj(previous().literal.str)));
     }
 
+    if (match({ IDENTIFIER })) {
+      return shared_ptr<Expr<Object>>(
+        new Variable<Object>(previous()));
+    }
+
     if (match({ LEFT_PAREN })) {
       shared_ptr<Expr<Object>> expr = expression();
       consume(RIGHT_PAREN, "Expect ')' after expression.");
@@ -205,10 +210,33 @@ void Parser::synchronize() {
     }
 }
 
+shared_ptr<Stmt> Parser::varDeclaration() {
+  Token name = consume(IDENTIFIER, "Expect variable name.");
+  shared_ptr<Expr<Object>> initializer;
+  if (match({ EQUAL })) {
+    initializer = expression();
+  }
+
+  consume(SEMICOLON, "Expect ';' after variable declaration.");
+  shared_ptr<Stmt> var(new Var(name, initializer));
+  return var;
+}
+
+
+shared_ptr<Stmt> Parser::declaration() {
+  try {
+    if (match({ VAR })) return varDeclaration();
+    return statement();
+  } catch (runtime_error error) {
+    synchronize();
+    return nullptr;
+  }
+}
+
 vector<shared_ptr<Stmt>> Parser::parse() {
   vector<shared_ptr<Stmt>> statements;
   while (!isAtEnd()) {
-    statements.push_back(statement());
+    statements.push_back(declaration());
   }
   return statements;
 }

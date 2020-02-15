@@ -22,13 +22,13 @@ class AstPrinter:
     string visitBinaryExpr(const Binary<string>& expr);
     string visitGroupingExpr(const Grouping<string>& expr);
     string visitUnaryExpr(const Unary<string>& expr);
+    string visitVariableExpr(const Variable<string>& expr) {};
    //  string visitCallExpr(const Call& expr);
    //  string visitGetExpr(const Get& expr);
    //  string visitLogicalExpr(const Logical& expr);
    //  string visitSetExpr(const Set& expr);
    //  string visitSuperExpr(const Super& expr);
    //  string visitThisExpr(const This& expr);
-   //  string visitVariableExpr(const Variable& expr);
 };
 
 #endif  // ASTPRINTER_HPP_

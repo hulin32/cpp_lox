@@ -44,6 +44,8 @@ class Parser {
     shared_ptr<Stmt> statement();
     shared_ptr<Stmt> printStatement();
     shared_ptr<Stmt> expressionStatement();
+    shared_ptr<Stmt> declaration();
+    shared_ptr<Stmt> varDeclaration();
 };
 
 #endif  // PARSER_HPP_

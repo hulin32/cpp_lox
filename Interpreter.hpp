@@ -11,6 +11,7 @@
 #include "./Expr.hpp"
 #include "./Stmt.hpp"
 #include "./Token.hpp"
+#include "./Environment.hpp"
 
 using std::shared_ptr;
 using std::string;
@@ -28,9 +29,12 @@ class Interpreter:
     Object visitBinaryExpr(const Binary<Object>& expr);
     Object visitGroupingExpr(const Grouping<Object>& expr);
     Object visitUnaryExpr(const Unary<Object>& expr);
+    Object visitVariableExpr(const Variable<Object>& expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
+    void visitVarStmt(const Var& stmt);
  private:
+    Environment environment;
     Object evaluate(shared_ptr<Expr<Object>> expr);
     void execute(shared_ptr<Stmt> stmt);
     bool isTruthy(Object object);

@@ -30,6 +30,9 @@ class Grouping;
 template<class R>
 class Unary;
 
+template<class R>
+class Variable;
+
 template <class R>
 class Visitor {
  public:
@@ -39,11 +42,11 @@ class Visitor {
     virtual R visitBinaryExpr(const Binary<R>& expr) = 0;
     virtual R visitGroupingExpr(const Grouping<R>& expr) = 0;
     virtual R visitUnaryExpr(const Unary<R>& expr) = 0;
+    virtual R visitVariableExpr(const Variable<R>& expr) = 0;
     // virtual string visitCallExpr(const Call& expr) = 0;
     // virtual string visitSetExpr(const Set& expr) = 0;
     // virtual string visitSuperExpr(const Super& expr) = 0;
     // virtual string visitThisExpr(const This& expr) = 0;
-    // virtual string visitVariableExpr(const Variable& expr) = 0;
 };
 
 template<class R>
@@ -118,6 +121,17 @@ class Unary: public Expr<R> {
     shared_ptr<Expr<R>> right;
 };
 
+template <class R>
+class Variable: public Expr<R> {
+ public:
+    explicit Variable(Token name_): name(name_) { };
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+        return visitor->visitVariableExpr(*this);
+    };
+    Token name;
+};
+
+
 // template <class R>
 // class Call: public Expr<R> {
 //  public:
@@ -189,15 +203,4 @@ class Unary: public Expr<R> {
 //     };
 //     Token keyword;
 // };
-
-// template <class R>
-// class Variable: public Expr<R> {
-//  public:
-//     explicit Variable(Token name);
-//     R accept(shared_ptr<Visitor<R>> visitor) override {
-//         return visitor->visitVariableExpr(*this);
-//     };
-//     Token name;
-// };
-
 #endif  // EXPR_HPP_

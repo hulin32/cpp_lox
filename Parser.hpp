@@ -25,6 +25,7 @@ class Parser {
  private:
     vector<Token> tokens;
     int current = 0;
+    shared_ptr<Expr<Object>> assignment();
     shared_ptr<Expr<Object>> expression();
     shared_ptr<Expr<Object>> equality();
     shared_ptr<Expr<Object>> comparison();

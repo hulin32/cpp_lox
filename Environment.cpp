@@ -21,3 +21,13 @@ Object Environment::get(Token name) {
     throw runtime_error(name.toString() +
         "Undefined variable '" + name.lexeme + "'.");
 }
+
+void Environment::assign(Token name, Object value) {
+  auto search = values.find(name.lexeme);
+    if (search != values.end()) {
+      search->second = value;
+      return;
+    }
+    throw runtime_error(name.toString() +
+        "Undefined variable '" + name.lexeme + "'.");
+}

@@ -8,8 +8,13 @@ addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
 multiplication → unary ( ( "/" | "*" ) unary )* ;
 unary          → ( "!" | "-" ) unary
                | primary ;
-primary        → NUMBER | STRING | "false" | "true" | "nil"
-               | "(" expression ")" ;
+primary        → "false" | "true" | "nil"
+               | NUMBER | STRING
+               | "(" expression ")"
+               | IDENTIFIER ;
+expression → assignment ;
+assignment → IDENTIFIER "=" assignment
+           | equality ;
 */
 
 #include <initializer_list>
@@ -17,6 +22,7 @@ primary        → NUMBER | STRING | "false" | "true" | "nil"
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "./Parser.hpp"
 #include "./Expr.hpp"
@@ -30,7 +36,23 @@ using std::to_string;
 using std::vector;
 
 shared_ptr<Expr<Object>> Parser::expression() {
-    return equality();
+    return assignment();
+}
+
+shared_ptr<Expr<Object>> Parser::assignment() {
+  shared_ptr<Expr<Object>> expr = equality();
+  if (match({ EQUAL })) {
+    Token equals = previous();
+    shared_ptr<Expr<Object>> value = assignment();
+
+    auto variable = dynamic_cast<Variable<Object>*>(expr.get());
+    if (variable != nullptr) {
+      Token name = variable->name;
+      return shared_ptr<Expr<Object>>(new Assign<Object>(name, value));
+    }
+    error(equals, "Invalid assignment target.");
+  }
+  return expr;
 }
 
 shared_ptr<Stmt> Parser::statement() {

@@ -13,6 +13,7 @@ using std::string;
 class Environment {
  public:
     void define(string name, Object value);
+    void assign(Token name, Object value);
     Object get(Token name);
  private:
     map<string, Object> values;

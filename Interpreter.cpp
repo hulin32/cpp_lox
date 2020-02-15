@@ -132,7 +132,9 @@ Object Interpreter::visitBinaryExpr(const Binary<Object>& expr) {
 }
 
 Object Interpreter::visitAssignExpr(const Assign<Object>& expr) {
-    return Object::make_nil_obj();
+    Object value = evaluate(expr.value);
+    environment.assign(expr.name, value);
+    return value;
 }
 
 Object Interpreter::visitVariableExpr(const Variable<Object>& expr) {

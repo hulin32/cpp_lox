@@ -26,6 +26,8 @@ class Parser {
     vector<Token> tokens;
     int current = 0;
     shared_ptr<Expr<Object>> assignment();
+    shared_ptr<Expr<Object>> orSmt();
+    shared_ptr<Expr<Object>> andSmt();
     shared_ptr<Expr<Object>> expression();
     shared_ptr<Expr<Object>> equality();
     shared_ptr<Expr<Object>> comparison();
@@ -43,6 +45,7 @@ class Parser {
     runtime_error error(Token token, string message);
     void synchronize();
     shared_ptr<Stmt> statement();
+    shared_ptr<Stmt> ifStatement();
     shared_ptr<Stmt> printStatement();
     shared_ptr<Stmt> expressionStatement();
     shared_ptr<Stmt> declaration();

@@ -30,10 +30,12 @@ class Interpreter:
     Object visitGroupingExpr(const Grouping<Object>& expr);
     Object visitUnaryExpr(const Unary<Object>& expr);
     Object visitVariableExpr(const Variable<Object>& expr);
+    Object visitLogicalExpr(const Logical<Object>& expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
     void visitBlockStmt(const Block& stmt);
+    void visitIfStmt(const If& stmt);
  private:
     shared_ptr<Environment> environment
       = shared_ptr<Environment>(new Environment());

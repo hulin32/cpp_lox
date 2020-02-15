@@ -141,6 +141,16 @@ Object Interpreter::visitAssignExpr(const Assign<Object>& expr) {
     return value;
 }
 
+Object Interpreter::visitLogicalExpr(const Logical<Object>& expr) {
+    Object left = evaluate(expr.left);
+    if (expr.operation.type == OR) {
+      if (isTruthy(left)) return left;
+    } else {
+      if (!isTruthy(left)) return left;
+    }
+    return evaluate(expr.right);
+}
+
 Object Interpreter::visitVariableExpr(const Variable<Object>& expr) {
     return environment->get(expr.name);
 }
@@ -166,6 +176,14 @@ void Interpreter::visitVarStmt(const Var& stmt) {
 void Interpreter::visitBlockStmt(const Block& stmt) {
     shared_ptr<Environment> env(new Environment(environment));
     executeBlock(stmt.statements, env);
+}
+
+void Interpreter::visitIfStmt(const If& stmt) {
+    if (isTruthy(evaluate(stmt.condition))) {
+      execute(stmt.thenBranch);
+    } else if (stmt.elseBranch != nullptr) {
+      execute(stmt.elseBranch);
+    }
 }
 
 Object Interpreter::evaluate(shared_ptr<Expr<Object>> expr) {

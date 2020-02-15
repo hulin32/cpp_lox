@@ -13,8 +13,10 @@ primary        → "false" | "true" | "nil"
                | "(" expression ")"
                | IDENTIFIER ;
 expression → assignment ;
-assignment → IDENTIFIER "=" assignment
-           | equality ;
+assignment → identifier "=" assignment
+           | logic_or ;
+logic_or   → logic_and ( "or" logic_and )* ;
+logic_and  → equality ( "and" equality )* ;
 */
 
 #include <initializer_list>
@@ -40,7 +42,7 @@ shared_ptr<Expr<Object>> Parser::expression() {
 }
 
 shared_ptr<Expr<Object>> Parser::assignment() {
-  shared_ptr<Expr<Object>> expr = equality();
+  shared_ptr<Expr<Object>> expr = orSmt();
   if (match({ EQUAL })) {
     Token equals = previous();
     shared_ptr<Expr<Object>> value = assignment();
@@ -55,7 +57,31 @@ shared_ptr<Expr<Object>> Parser::assignment() {
   return expr;
 }
 
+shared_ptr<Expr<Object>> Parser::orSmt() {
+    shared_ptr<Expr<Object>> expr = andSmt();
+    while (match({ OR })) {
+      Token operation = previous();
+      shared_ptr<Expr<Object>> right = andSmt();
+      expr =  shared_ptr<Expr<Object>>(
+        new Logical<Object>(expr, operation, right));
+    }
+    return expr;
+}
+
+shared_ptr<Expr<Object>> Parser::andSmt() {
+    shared_ptr<Expr<Object>> expr = equality();
+    while (match({ AND })) {
+      Token operation = previous();
+      shared_ptr<Expr<Object>> right = equality();
+      expr = shared_ptr<Expr<Object>>(new Logical<Object>(expr, operation, right));
+    }
+    return expr;
+}
+
 shared_ptr<Stmt> Parser::statement() {
+  if (match({ IF })) {
+    return ifStatement();
+  }
   if (match({ PRINT })) {
     return printStatement();
   }
@@ -63,6 +89,18 @@ shared_ptr<Stmt> Parser::statement() {
     return shared_ptr<Stmt>(new Block(block()));
   }
   return expressionStatement();
+}
+
+shared_ptr<Stmt> Parser::ifStatement() {
+    consume(LEFT_PAREN, "Expect '(' after 'if'.");
+    shared_ptr<Expr<Object>> condition = expression();
+    consume(RIGHT_PAREN, "Expect ')' after if condition.");
+    shared_ptr<Stmt> thenBranch = statement();
+    shared_ptr<Stmt> elseBranch = nullptr;
+    if (match({ ELSE })) {
+      elseBranch = statement();
+    }
+    return shared_ptr<Stmt>(new If(condition, thenBranch, elseBranch));
 }
 
 shared_ptr<Stmt> Parser::printStatement() {

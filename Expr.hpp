@@ -33,6 +33,9 @@ class Unary;
 template<class R>
 class Variable;
 
+template<class R>
+class Logical;
+
 template <class R>
 class Visitor {
  public:
@@ -43,6 +46,7 @@ class Visitor {
     virtual R visitGroupingExpr(const Grouping<R>& expr) = 0;
     virtual R visitUnaryExpr(const Unary<R>& expr) = 0;
     virtual R visitVariableExpr(const Variable<R>& expr) = 0;
+    virtual R visitLogicalExpr(const Logical<R>& expr) = 0;
     // virtual string visitCallExpr(const Call& expr) = 0;
     // virtual string visitSetExpr(const Set& expr) = 0;
     // virtual string visitSuperExpr(const Super& expr) = 0;
@@ -124,13 +128,28 @@ class Unary: public Expr<R> {
 template <class R>
 class Variable: public Expr<R> {
  public:
-    explicit Variable(Token name_): name(name_) { };
+    explicit Variable(Token name_): name(name_) { }
     R accept(shared_ptr<Visitor<R>> visitor) override {
         return visitor->visitVariableExpr(*this);
     };
     Token name;
 };
 
+template <class R>
+class Logical: public Expr<R> {
+ public:
+    Logical(
+        shared_ptr<Expr<R>> left_,
+        Token operation_,
+        shared_ptr<Expr<R>> right_):
+    left(left_), operation(operation_), right(right_) { }
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+        return visitor->visitLogicalExpr(*this);
+    };
+    shared_ptr<Expr<R>> left;
+    Token operation;
+    shared_ptr<Expr<R>> right;
+};
 
 // template <class R>
 // class Call: public Expr<R> {
@@ -157,18 +176,6 @@ class Variable: public Expr<R> {
 //     }
 //     Token name;
 //     shared_ptr<Expr<R>> object;
-// };
-
-// template <class R>
-// class Logical: public Expr<R> {
-//  public:
-//     Logical(shared_ptr<Expr<R>> left, Token operation, shared_ptr<Expr<R>> right);
-//     R accept(shared_ptr<Visitor<R>> visitor) override {
-//         return visitor->visitLogicalExpr(*this);
-//     };
-//     shared_ptr<Expr<R>> left;
-//     Token operation;
-//     shared_ptr<Expr<R>> right;
 // };
 
 // template <class R>

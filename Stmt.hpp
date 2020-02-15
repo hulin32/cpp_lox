@@ -6,9 +6,12 @@ program     → declaration* EOF ;
 declaration → varDecl
             | statement ;
 
-statement   → exprStmt
-            | printStmt
-            | block ;
+statement → exprStmt
+          | ifStmt
+          | printStmt
+          | block ;
+
+ifStmt    → "if" "(" expression ")" statement ( "else" statement )? ;
 
 block     → "{" declaration* "}" ;
 
@@ -39,6 +42,7 @@ class Expression;
 class Print;
 class Var;
 class Block;
+class If;
 
 class Visitor_Stmt {
  public:
@@ -47,6 +51,7 @@ class Visitor_Stmt {
     virtual void visitPrintStmt(const Print& stmt) = 0;
     virtual void visitVarStmt(const Var& stmt) = 0;
     virtual void visitBlockStmt(const Block& stmt) = 0;
+    virtual void visitIfStmt(const If& stmt) = 0;
 };
 
 class Stmt {
@@ -96,6 +101,23 @@ class Block: public Stmt {
         visitor->visitBlockStmt(*this);
     }
     vector<shared_ptr<Stmt>> statements;
+};
+
+class If: public Stmt {
+ public:
+    If(
+        shared_ptr<Expr<Object>> condition_,
+        shared_ptr<Stmt> thenBranch_,
+        shared_ptr<Stmt> elseBranch_):
+        condition(condition_),
+        thenBranch(thenBranch_),
+        elseBranch(elseBranch_) { }
+    void accept(shared_ptr<Visitor_Stmt> visitor) override {
+        visitor->visitIfStmt(*this);
+    }
+    shared_ptr<Expr<Object>> condition;
+    shared_ptr<Stmt> thenBranch;
+    shared_ptr<Stmt> elseBranch;
 };
 
 #endif  // STMT_HPP_

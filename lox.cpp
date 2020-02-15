@@ -11,6 +11,7 @@
 #include "./Scanner.hpp"
 #include "./Parser.hpp"
 #include "./Expr.hpp"
+#include "./Stmt.hpp"
 #include "./AstPrinter.hpp"
 #include "./Interpreter.hpp"
 
@@ -75,16 +76,14 @@ void lox::run(string source) {
         // cout << token.toString() << endl;
     // }
     shared_ptr<Parser> parser(new Parser(tokens));
-    shared_ptr<Expr<Object>> expression = parser->parse();
+    vector<shared_ptr<Stmt>> statements = parser->parse();
     // Stop if there was a syntax error.
     if (hadError) return;
-    if (expression == nullptr) {
+    if (statements.size() == 0) {
         cout << "no value" << endl;
     } else {
         shared_ptr<Interpreter> interpreter(new Interpreter());
-        interpreter->interpret(expression);
-        // shared_ptr<AstPrinter> astPrinter(new AstPrinter);
-        // cout << astPrinter->print(expression) << endl;
+        interpreter->interpret(statements);
     }
 }
 

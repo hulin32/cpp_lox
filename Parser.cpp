@@ -20,6 +20,7 @@ primary        → NUMBER | STRING | "false" | "true" | "nil"
 
 #include "./Parser.hpp"
 #include "./Expr.hpp"
+#include "./Stmt.hpp"
 #include "./Token.hpp"
 
 using std::initializer_list;
@@ -30,6 +31,27 @@ using std::vector;
 
 shared_ptr<Expr<Object>> Parser::expression() {
     return equality();
+}
+
+shared_ptr<Stmt> Parser::statement() {
+  if (match({ PRINT })) {
+    return printStatement();
+  }
+  return expressionStatement();
+}
+
+shared_ptr<Stmt> Parser::printStatement() {
+  shared_ptr<Expr<Object>> value = expression();
+  consume(SEMICOLON, "Expect ';' after value.");
+  shared_ptr<Stmt> print(new Print(value));
+  return print;
+}
+
+shared_ptr<Stmt> Parser::expressionStatement() {
+  shared_ptr<Expr<Object>> expr = expression();
+  consume(SEMICOLON, "Expect ';' after expression.");
+  shared_ptr<Stmt> expression(new Expression(expr));
+  return expression;
 }
 
 shared_ptr<Expr<Object>> Parser::equality() {
@@ -183,10 +205,10 @@ void Parser::synchronize() {
     }
 }
 
-shared_ptr<Expr<Object>> Parser::parse() {
-  try {
-    return expression();
-  } catch (runtime_error error) {
-    return nullptr;
+vector<shared_ptr<Stmt>> Parser::parse() {
+  vector<shared_ptr<Stmt>> statements;
+  while (!isAtEnd()) {
+    statements.push_back(statement());
   }
+  return statements;
 }

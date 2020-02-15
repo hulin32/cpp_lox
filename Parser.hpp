@@ -10,6 +10,7 @@
 #include <initializer_list>
 #include "./Token.hpp"
 #include "./Expr.hpp"
+#include "./Stmt.hpp"
 
 using std::vector;
 using std::shared_ptr;
@@ -20,7 +21,7 @@ using std::runtime_error;
 class Parser {
  public:
     explicit Parser(vector<Token> tokens_): tokens(tokens_) { }
-    shared_ptr<Expr<Object>> parse();
+    vector<shared_ptr<Stmt>> parse();
  private:
     vector<Token> tokens;
     int current = 0;
@@ -40,6 +41,9 @@ class Parser {
     Token consume(TokenType type, string message);
     runtime_error error(Token token, string message);
     void synchronize();
+    shared_ptr<Stmt> statement();
+    shared_ptr<Stmt> printStatement();
+    shared_ptr<Stmt> expressionStatement();
 };
 
 #endif  // PARSER_HPP_

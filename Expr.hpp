@@ -82,8 +82,8 @@ class Binary: public Expr<R> {
     Binary(
         shared_ptr<Expr<R>> left_,
         Token operation,
-        shared_ptr<Expr<R>> right_
-    ): left(left_), operation(operation), right(right_) { }
+        shared_ptr<Expr<R>> right_):
+    left(left_), operation(operation), right(right_) { }
 
     R accept(shared_ptr<Visitor<R>> visitor) override {
       return visitor->visitBinaryExpr(*this);

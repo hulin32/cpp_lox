@@ -4,10 +4,12 @@
 #include <string>
 #include <memory>
 #include <iostream>
+#include <vector>
 
 #include "./Interpreter.hpp"
 #include "./Expr.hpp"
 #include "./Token.hpp"
+#include "./Stmt.hpp"
 #include "./RuntimeError.hpp"
 #include "./lox.hpp"
 
@@ -15,22 +17,23 @@ using std::stod;
 using std::shared_ptr;
 using std::cout;
 using std::endl;
-
-
-void Interpreter::interpret(shared_ptr<Expr<Object>> expression) {
-    try {
-        Object value = evaluate(expression);
-        cout << stringify(value) << endl;
-    } catch (RuntimeError error) {
-        lox::runtimeError(error);
-    }
-}
+using std::vector;
 
 bool endsWith(std::string str, std::string suffix) {
     if (str.length() < suffix.length()) {
         return false;
     }
     return str.substr(str.length() - suffix.length()) == suffix;
+}
+
+void Interpreter::interpret(vector<shared_ptr<Stmt>> statements) {
+    try {
+      for (auto statement : statements) {
+        execute(statement);
+      }
+    } catch (RuntimeError error) {
+      lox::runtimeError(error);
+    }
 }
 
 string Interpreter::stringify(Object object) {
@@ -132,9 +135,21 @@ Object Interpreter::visitAssignExpr(const Assign<Object>& expr) {
     return Object::make_nil_obj();
 }
 
+void Interpreter::visitExpressionStmt(const Expression& stmt) {
+    evaluate(stmt.expression);
+}
+
+void Interpreter::visitPrintStmt(const Print& stmt) {
+    Object value = evaluate(stmt.expression);
+    cout << stringify(value) << endl;
+}
 
 Object Interpreter::evaluate(shared_ptr<Expr<Object>> expr) {
     return expr->accept(shared_from_this());
+}
+
+void Interpreter::execute(shared_ptr<Stmt> stmt) {
+    stmt->accept(shared_from_this());
 }
 
 bool Interpreter::isTruthy(Object object) {

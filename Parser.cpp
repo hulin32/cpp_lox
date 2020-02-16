@@ -131,7 +131,7 @@ shared_ptr<Stmt> Parser::expressionStatement() {
 vector<shared_ptr<Stmt>> Parser::block() {
     vector<shared_ptr<Stmt>> statements;
 
-    while (!check({ RIGHT_BRACE }) && !isAtEnd()) {
+    while (!check(RIGHT_BRACE) && !isAtEnd()) {
       statements.push_back(declaration());
     }
     consume(RIGHT_BRACE, "Expect '}' after block.");

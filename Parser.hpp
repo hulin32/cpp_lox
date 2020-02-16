@@ -45,6 +45,7 @@ class Parser {
     runtime_error error(Token token, string message);
     void synchronize();
     shared_ptr<Stmt> statement();
+    shared_ptr<Stmt> forStatement();
     shared_ptr<Stmt> ifStatement();
     shared_ptr<Stmt> whileStatement();
     shared_ptr<Stmt> printStatement();

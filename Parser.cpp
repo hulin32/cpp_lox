@@ -79,6 +79,9 @@ shared_ptr<Expr<Object>> Parser::andSmt() {
 }
 
 shared_ptr<Stmt> Parser::statement() {
+  if (match({ FOR })) {
+    return forStatement();
+  }
   if (match({ IF })) {
     return ifStatement();
   }
@@ -92,6 +95,54 @@ shared_ptr<Stmt> Parser::statement() {
     return shared_ptr<Stmt>(new Block(block()));
   }
   return expressionStatement();
+}
+
+shared_ptr<Stmt> Parser::forStatement() {
+    consume(LEFT_PAREN, "Expect '(' after 'for'.");
+    shared_ptr<Stmt> initializer;
+    if (match({ SEMICOLON })) {
+      initializer = nullptr;
+    } else if (match({ VAR })) {
+      initializer = varDeclaration();
+    } else {
+      initializer = expressionStatement();
+    }
+
+    shared_ptr<Expr<Object>> condition = nullptr;
+    if (!check({ SEMICOLON })) {
+      condition = expression();
+    }
+    consume(SEMICOLON, "Expect ';' after loop condition.");
+
+    shared_ptr<Expr<Object>> increment = nullptr;
+    if (!check({ RIGHT_PAREN })) {
+      increment = expression();
+    }
+    consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    shared_ptr<Stmt> body = statement();
+
+    if (increment != nullptr) {
+      vector<shared_ptr<Stmt>> stmts;
+      stmts.push_back(body);
+      stmts.push_back(shared_ptr<Stmt>(new Expression(increment)));
+      body = shared_ptr<Stmt>(new Block(stmts));
+    }
+
+    if (condition == nullptr) {
+      condition = shared_ptr<Expr<Object>>(
+        new Literal<Object>(Object::make_bool_obj(true)));
+    }
+    body = shared_ptr<Stmt>(new While(condition, body));
+
+    if (initializer != nullptr) {
+      vector<shared_ptr<Stmt>> stmts2;
+      stmts2.push_back(initializer);
+      stmts2.push_back(body);
+      body = shared_ptr<Stmt>(new Block(stmts2));
+    }
+
+    return body;
 }
 
 shared_ptr<Stmt> Parser::ifStatement() {

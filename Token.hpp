@@ -49,29 +49,29 @@ struct Object {
     }
     static Object make_num_obj(double num) {
       Object num_obj;
-      num_obj.type = Object::Object_num;
+      num_obj.type = Object_num;
       num_obj.num = num;
       return num_obj;
     }
 
     static Object make_str_obj(string str) {
       Object str_obj;
-      str_obj.type = Object::Object_str;
+      str_obj.type = Object_str;
       str_obj.str = str;
       return str_obj;
     }
 
     static Object make_bool_obj(bool boolean) {
       Object bool_obj;
-      bool_obj.type = Object::Object_num;
+      bool_obj.type = Object_bool;
       bool_obj.boolean = boolean;
       return bool_obj;
     }
 
     static Object make_nil_obj() {
       Object nil_obj;
-      nil_obj.type = Object::Object_nil;
-      nil_obj.nil = NULL;
+      nil_obj.type = Object_nil;
+      nil_obj.nil = nullptr;
       return nil_obj;
     }
 };

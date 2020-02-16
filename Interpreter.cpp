@@ -86,6 +86,7 @@ Object Interpreter::visitBinaryExpr(const Binary<Object>& expr) {
     bool result_bool = false;
     string result_str = "";
     double result_num = 0;
+    Object foo;
     switch (expr.operation.type) {
       case GREATER:
         checkNumberOperands(expr.operation, left, right);
@@ -98,6 +99,8 @@ Object Interpreter::visitBinaryExpr(const Binary<Object>& expr) {
       case LESS:
         checkNumberOperands(expr.operation, left, right);
         result_bool = left.num < right.num;
+        foo = Object::make_bool_obj(result_bool);
+        foo = Object::make_bool_obj(result_bool);
         return Object::make_bool_obj(result_bool);
       case LESS_EQUAL:
         checkNumberOperands(expr.operation, left, right);
@@ -165,7 +168,6 @@ void Interpreter::visitPrintStmt(const Print& stmt) {
 }
 
 void Interpreter::visitVarStmt(const Var& stmt) {
-    // cout << stringify(value) << endl;
     Object value = Object::make_nil_obj();
     if (stmt.initializer != nullptr) {
       value = evaluate(stmt.initializer);
@@ -180,6 +182,7 @@ void Interpreter::visitBlockStmt(const Block& stmt) {
 
 void Interpreter::visitWhileStmt(const While& stmt) {
     while (isTruthy(evaluate(stmt.condition))) {
+      Object obj =  evaluate(stmt.condition);
       execute(stmt.body);
     }
 }

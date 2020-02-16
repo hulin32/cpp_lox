@@ -1,2 +1,6 @@
-print "hi" or 2;
-print nil or "yes";
+var a = 0;
+
+while (a < 5) {
+  print a;
+  a = a + 1;
+}

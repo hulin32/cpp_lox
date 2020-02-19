@@ -5,11 +5,11 @@
 
 #include <string>
 #include <iostream>
-#include <list>
+#include <vector>
 #include <memory>
 #include "./Token.hpp"
 
-using std::list;
+using std::vector;
 using std::string;
 using std::shared_ptr;
 using std::cout;
@@ -36,6 +36,9 @@ class Variable;
 template<class R>
 class Logical;
 
+template<class R>
+class Call;
+
 template <class R>
 class Visitor {
  public:
@@ -47,7 +50,7 @@ class Visitor {
     virtual R visitUnaryExpr(const Unary<R>& expr) = 0;
     virtual R visitVariableExpr(const Variable<R>& expr) = 0;
     virtual R visitLogicalExpr(const Logical<R>& expr) = 0;
-    // virtual string visitCallExpr(const Call& expr) = 0;
+    virtual R visitCallExpr(const Call<R>& expr) = 0;
     // virtual string visitSetExpr(const Set& expr) = 0;
     // virtual string visitSuperExpr(const Super& expr) = 0;
     // virtual string visitThisExpr(const This& expr) = 0;
@@ -151,21 +154,21 @@ class Logical: public Expr<R> {
     shared_ptr<Expr<R>> right;
 };
 
-// template <class R>
-// class Call: public Expr<R> {
-//  public:
-//     Call(
-//         shared_ptr<Expr<R>> callee_,
-//         Token paren_,
-//         list<shared_ptr<Expr<R>>> arguments_
-//     ): callee(callee_), paren(paren_), arguments(arguments_){ }
-//     R accept(shared_ptr<Visitor<R>> visitor) override {
-//       return visitor->visitCallExpr(*this);
-//     }
-//     shared_ptr<Expr<R>> callee;
-//     Token paren;
-//     list<shared_ptr<Expr<R>>> arguments;
-// };
+template <class R>
+class Call: public Expr<R> {
+ public:
+    Call(
+        shared_ptr<Expr<R>> callee_,
+        Token paren_,
+        vector<shared_ptr<Expr<R>>> arguments_):
+    callee(callee_), paren(paren_), arguments(arguments_) { }
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+      return visitor->visitCallExpr(*this);
+    }
+    shared_ptr<Expr<R>> callee;
+    Token paren;
+    vector<shared_ptr<Expr<R>>> arguments;
+};
 
 // template <class R>
 // class Get: public Expr<R> {

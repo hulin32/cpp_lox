@@ -1,6 +1,5 @@
 // Copyright 2020 <Copyright hulin>
 
-
 #include <string>
 #include <memory>
 #include <iostream>
@@ -13,6 +12,9 @@
 #include "./Stmt.hpp"
 #include "./RuntimeError.hpp"
 #include "./Environment.hpp"
+#include "./LoxCallable.hpp"
+#include "./LoxFunction.hpp"
+#include "./ReturnError.hpp"
 #include "./lox.hpp"
 
 using std::stod;
@@ -22,6 +24,7 @@ using std::cout;
 using std::endl;
 using std::vector;
 using std::exception;
+using std::to_string;
 
 bool endsWith(std::string str, std::string suffix) {
     if (str.length() < suffix.length()) {
@@ -158,6 +161,28 @@ Object Interpreter::visitVariableExpr(const Variable<Object>& expr) {
     return environment->get(expr.name);
 }
 
+Object Interpreter::visitCallExpr(const Call<Object>& expr) {
+    Object callee = evaluate(expr.callee);
+
+    vector<Object> arguments;
+    for (auto argument : expr.arguments) {
+      arguments.push_back(evaluate(argument));
+    }
+
+    if (callee.type != Object::Object_fun) {
+        throw RuntimeError(expr.paren,
+          "Can only call functions and classes.");
+    }
+
+    shared_ptr<LoxCallable> function = callee.function;
+    if (arguments.size() != function->arity()) {
+      throw RuntimeError(expr.paren, "Expected " +
+          to_string(function->arity()) + " arguments but got " +
+          to_string(arguments.size()) + ".");
+    }
+    return function->call(shared_from_this(), arguments);
+}
+
 void Interpreter::visitExpressionStmt(const Expression& stmt) {
     evaluate(stmt.expression);
 }
@@ -165,6 +190,12 @@ void Interpreter::visitExpressionStmt(const Expression& stmt) {
 void Interpreter::visitPrintStmt(const Print& stmt) {
     Object value = evaluate(stmt.expression);
     cout << stringify(value) << endl;
+}
+
+void Interpreter::visitReturnStmt(const Return& stmt) {
+    Object value;
+    if (stmt.value != nullptr) value = evaluate(stmt.value);
+    throw ReturnError(value);
 }
 
 void Interpreter::visitVarStmt(const Var& stmt) {
@@ -193,6 +224,12 @@ void Interpreter::visitIfStmt(const If& stmt) {
     } else if (stmt.elseBranch != nullptr) {
       execute(stmt.elseBranch);
     }
+}
+
+void Interpreter::visitFunctionStmt(const Function& stmt) {
+    shared_ptr<LoxFunction> function(new LoxFunction(stmt));
+    Object obj = Object::make_fun_obj(function);
+    environment->define(stmt.name.lexeme, obj);
 }
 
 Object Interpreter::evaluate(shared_ptr<Expr<Object>> expr) {
@@ -245,6 +282,8 @@ bool Interpreter::isEqual(Object a, Object b) {
                 return a.num == b.num;
             case Object::Object_str:
                 return a.str == b.str;
+            default:
+                return false;
         }
     } else {
         return false;

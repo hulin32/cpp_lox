@@ -4,9 +4,12 @@
 #define TOKEN_HPP_
 
 #include <string>
+#include <memory>
 
 using std::string;
-using std::to_string;
+using std::shared_ptr;
+
+class LoxCallable;
 
 typedef enum {
   LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
@@ -28,52 +31,27 @@ typedef enum {
   TOKEN_EOF
 } TokenType;
 
-struct Object {
-    typedef enum { Object_str, Object_num, Object_bool, Object_nil } Object_type;
+class Object {
+ public:
+    typedef enum {
+      Object_str,
+      Object_num,
+      Object_bool,
+      Object_nil,
+      Object_fun,
+    } Object_type;
     string str;
     double num;
     bool boolean;
     int* nil;
     Object_type type;
-    string toString() {
-      switch (type) {
-        case Object_nil:
-          return "nil";
-        case Object_bool:
-          return boolean ? "1" : "0";
-        case Object_str:
-          return str;
-        default:
-          return to_string(num);
-      }
-    }
-    static Object make_num_obj(double num) {
-      Object num_obj;
-      num_obj.type = Object_num;
-      num_obj.num = num;
-      return num_obj;
-    }
-
-    static Object make_str_obj(string str) {
-      Object str_obj;
-      str_obj.type = Object_str;
-      str_obj.str = str;
-      return str_obj;
-    }
-
-    static Object make_bool_obj(bool boolean) {
-      Object bool_obj;
-      bool_obj.type = Object_bool;
-      bool_obj.boolean = boolean;
-      return bool_obj;
-    }
-
-    static Object make_nil_obj() {
-      Object nil_obj;
-      nil_obj.type = Object_nil;
-      nil_obj.nil = nullptr;
-      return nil_obj;
-    }
+    string toString();
+    shared_ptr<LoxCallable> function;
+    static Object make_num_obj(double num);
+    static Object make_str_obj(string str);
+    static Object make_bool_obj(bool boolean);
+    static Object make_nil_obj();
+    static Object make_fun_obj(shared_ptr<LoxCallable> function_);
 };
 
 class Token {

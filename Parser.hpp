@@ -22,6 +22,7 @@ class Parser {
  public:
     explicit Parser(vector<Token> tokens_): tokens(tokens_) { }
     vector<shared_ptr<Stmt>> parse();
+
  private:
     vector<Token> tokens;
     int current = 0;
@@ -34,6 +35,8 @@ class Parser {
     shared_ptr<Expr<Object>> addition();
     shared_ptr<Expr<Object>> multiplication();
     shared_ptr<Expr<Object>> unary();
+    shared_ptr<Expr<Object>> finishCall(shared_ptr<Expr<Object>> callee);
+    shared_ptr<Expr<Object>> call();
     shared_ptr<Expr<Object>> primary();
     bool match(const initializer_list<TokenType> &types);
     bool check(TokenType type);
@@ -49,7 +52,9 @@ class Parser {
     shared_ptr<Stmt> ifStatement();
     shared_ptr<Stmt> whileStatement();
     shared_ptr<Stmt> printStatement();
+    shared_ptr<Stmt> returnStatement();
     shared_ptr<Stmt> expressionStatement();
+    shared_ptr<Stmt> function(string kind);
     shared_ptr<Stmt> declaration();
     shared_ptr<Stmt> varDeclaration();
     vector<shared_ptr<Stmt>> block();

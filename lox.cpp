@@ -12,8 +12,8 @@
 #include "./Parser.hpp"
 #include "./Expr.hpp"
 #include "./Stmt.hpp"
-#include "./AstPrinter.hpp"
 #include "./Interpreter.hpp"
+#include "./RuntimeError.hpp"
 
 
 using std::string;

@@ -6,8 +6,9 @@ equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
 addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
 multiplication → unary ( ( "/" | "*" ) unary )* ;
-unary          → ( "!" | "-" ) unary
-               | primary ;
+unary → ( "!" | "-" ) unary | call ;
+call  → primary ( "(" arguments? ")" )* ;
+arguments → expression ( "," expression )* ;
 primary        → "false" | "true" | "nil"
                | NUMBER | STRING
                | "(" expression ")"
@@ -88,6 +89,9 @@ shared_ptr<Stmt> Parser::statement() {
   if (match({ PRINT })) {
     return printStatement();
   }
+  if (match({ RETURN })) {
+    return returnStatement();
+  }
   if (match({ WHILE })) {
     return whileStatement();
   }
@@ -109,13 +113,13 @@ shared_ptr<Stmt> Parser::forStatement() {
     }
 
     shared_ptr<Expr<Object>> condition = nullptr;
-    if (!check({ SEMICOLON })) {
+    if (!check(SEMICOLON)) {
       condition = expression();
     }
     consume(SEMICOLON, "Expect ';' after loop condition.");
 
     shared_ptr<Expr<Object>> increment = nullptr;
-    if (!check({ RIGHT_PAREN })) {
+    if (!check(RIGHT_PAREN)) {
       increment = expression();
     }
     consume(RIGHT_PAREN, "Expect ')' after for clauses.");
@@ -164,6 +168,16 @@ shared_ptr<Stmt> Parser::printStatement() {
   return print;
 }
 
+shared_ptr<Stmt> Parser::returnStatement() {
+  Token keyword = previous();
+  shared_ptr<Expr<Object>> value;
+    if (!check(SEMICOLON)) {
+      value = expression();
+    }
+    consume(SEMICOLON, "Expect ';' after return value.");
+    return shared_ptr<Stmt>(new Return(keyword, value));
+}
+
 shared_ptr<Stmt> Parser::whileStatement() {
     consume(LEFT_PAREN, "Expect '(' after 'while'.");
     shared_ptr<Expr<Object>> condition = expression();
@@ -178,6 +192,24 @@ shared_ptr<Stmt> Parser::expressionStatement() {
   shared_ptr<Stmt> expression(new Expression(expr));
   return expression;
 }
+
+shared_ptr<Stmt> Parser::function(string kind) {
+    Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+    consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+    vector<Token> parameters;
+    if (!check(RIGHT_PAREN)) {
+      do {
+        if (parameters.size() >= 255) {
+          error(peek(), "Cannot have more than 255 parameters.");
+        }
+        parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+      } while (match({ COMMA }));
+    }
+    consume(RIGHT_PAREN, "Expect ')' after parameters.");
+    consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+    vector<shared_ptr<Stmt>> body = block();
+    return shared_ptr<Stmt>(new Function(name, parameters, body));
+  }
 
 vector<shared_ptr<Stmt>> Parser::block() {
     vector<shared_ptr<Stmt>> statements;
@@ -216,7 +248,8 @@ shared_ptr<Expr<Object>> Parser::addition() {
     while (match({ MINUS, PLUS })) {
       Token operation = previous();
       shared_ptr<Expr<Object>> right = multiplication();
-      expr = shared_ptr<Expr<Object>>(new Binary<Object>(expr, operation, right));
+      expr = shared_ptr<Expr<Object>>(
+        new Binary<Object>(expr, operation, right));
     }
     return expr;
 }
@@ -226,7 +259,8 @@ shared_ptr<Expr<Object>> Parser::multiplication() {
     while (match({ SLASH, STAR })) {
       Token operation = previous();
       shared_ptr<Expr<Object>> right = unary();
-      expr = shared_ptr<Expr<Object>>(new Binary<Object>(expr, operation, right));
+      expr = shared_ptr<Expr<Object>>(
+        new Binary<Object>(expr, operation, right));
     }
 
     return expr;
@@ -238,7 +272,36 @@ shared_ptr<Expr<Object>> Parser::unary() {
       shared_ptr<Expr<Object>> right = unary();
       return shared_ptr<Expr<Object>>(new Unary<Object>(operation, right));
     }
-    return primary();
+    return call();
+}
+
+shared_ptr<Expr<Object>> Parser::finishCall(shared_ptr<Expr<Object>> callee) {
+    vector<shared_ptr<Expr<Object>>> arguments;
+    if (!check(RIGHT_PAREN)) {
+      do {
+        if (arguments.size() >= 255) {
+          error(peek(), "Cannot have more than 255 arguments.");
+        }
+        arguments.push_back(expression());
+      } while (match({ COMMA }));
+    }
+
+    Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+    return shared_ptr<Expr<Object>>(
+      new Call<Object>(callee, paren, arguments));
+}
+
+shared_ptr<Expr<Object>> Parser::call() {
+    shared_ptr<Expr<Object>> expr = primary();
+    while (true) {
+      if (match({ LEFT_PAREN })) {
+        expr = finishCall(expr);
+      } else {
+        break;
+      }
+    }
+    return expr;
 }
 
 shared_ptr<Expr<Object>> Parser::primary() {
@@ -360,6 +423,7 @@ shared_ptr<Stmt> Parser::varDeclaration() {
 
 shared_ptr<Stmt> Parser::declaration() {
   try {
+    if (match({ FUN })) return function("function");
     if (match({ VAR })) return varDeclaration();
     return statement();
   } catch (runtime_error error) {

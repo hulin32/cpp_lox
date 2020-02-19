@@ -3,8 +3,13 @@
 /*
 program     → declaration* EOF ;
 
-declaration → varDecl
+declaration → funDecl
+            | varDecl
             | statement ;
+
+funDecl  → "fun" function ;
+function → IDENTIFIER "(" parameters? ")" block ;
+parameters → IDENTIFIER ( "," IDENTIFIER )* ;
 
 statement → exprStmt
           | forStmt
@@ -52,6 +57,8 @@ class Var;
 class Block;
 class If;
 class While;
+class Function;
+class Return;
 
 class Visitor_Stmt {
  public:
@@ -62,6 +69,8 @@ class Visitor_Stmt {
     virtual void visitBlockStmt(const Block& stmt) = 0;
     virtual void visitIfStmt(const If& stmt) = 0;
     virtual void visitWhileStmt(const While& stmt) = 0;
+    virtual void visitFunctionStmt(const Function& stmt) = 0;
+    virtual void visitReturnStmt(const Return& stmt) = 0;
 };
 
 class Stmt {
@@ -142,6 +151,34 @@ class While: public Stmt {
     }
     shared_ptr<Expr<Object>> condition;
     shared_ptr<Stmt> body;
+};
+
+class Function: public Stmt {
+ public:
+    Function(
+        Token name_,
+        vector<Token> params_,
+        vector<shared_ptr<Stmt>> body_):
+        name(name_),
+        params(params_),
+        body(body_) { }
+    void accept(shared_ptr<Visitor_Stmt> visitor) override {
+        visitor->visitFunctionStmt(*this);
+    }
+    Token name;
+    vector<Token> params;
+    vector<shared_ptr<Stmt>> body;
+};
+
+class Return: public Stmt {
+ public:
+    Return(Token name_, shared_ptr<Expr<Object>> value_):
+     name(name_), value(value_) { }
+    void accept(shared_ptr<Visitor_Stmt> visitor) override {
+        visitor->visitReturnStmt(*this);
+    }
+    Token name;
+    shared_ptr<Expr<Object>> value;
 };
 
 #endif  // STMT_HPP_

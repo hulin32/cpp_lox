@@ -20,8 +20,7 @@ using std::vector;
 class Interpreter:
     public Visitor<Object>,
     public Visitor_Stmt,
-    public std::enable_shared_from_this<Interpreter>
-{
+    public std::enable_shared_from_this<Interpreter> {
  public:
     void interpret(vector<shared_ptr<Stmt>> statements);
     Object visitLiteralExpr(const Literal<Object>& expr);
@@ -31,20 +30,25 @@ class Interpreter:
     Object visitUnaryExpr(const Unary<Object>& expr);
     Object visitVariableExpr(const Variable<Object>& expr);
     Object visitLogicalExpr(const Logical<Object>& expr);
+    Object visitCallExpr(const Call<Object>& expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
     void visitBlockStmt(const Block& stmt);
     void visitIfStmt(const If& stmt);
     void visitWhileStmt(const While& stmt);
+    void visitFunctionStmt(const Function& stmt);
+    void visitReturnStmt(const Return& stmt);
+    void executeBlock(
+        vector<shared_ptr<Stmt>> statements,
+        shared_ptr<Environment> environment);
+    shared_ptr<Environment> globals
+      = shared_ptr<Environment>(new Environment());
  private:
     shared_ptr<Environment> environment
       = shared_ptr<Environment>(new Environment());
     Object evaluate(shared_ptr<Expr<Object>> expr);
     void execute(shared_ptr<Stmt> stmt);
-    void executeBlock(
-        vector<shared_ptr<Stmt>> statements,
-        shared_ptr<Environment> environment);
     bool isTruthy(Object object);
     bool isEqual(Object a, Object b);
     void checkNumberOperand(Token operation, Object operand);

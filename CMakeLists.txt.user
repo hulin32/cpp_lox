@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2020-02-16T10:48:38. -->
+<!-- Written by QtCreator 4.11.0, 2020-02-19T18:51:45. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -336,7 +336,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/tiger/Documents/learning/cplusplus/build-cpp_lox-Desktop_x86_darwin_generic_mach_o_64bit-Debug</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/private/var/folders/tw/ss12ypqj7dj84rk07_x7pzmw0000gp/T/QtCreator-nklAxp/qtc-cmake-popfLRfM</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

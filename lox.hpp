@@ -5,7 +5,6 @@
 
 #include <string>
 #include "./RuntimeError.hpp"
-#include "./Interpreter.hpp"
 
 using std::string;
 

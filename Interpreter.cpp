@@ -227,7 +227,7 @@ void Interpreter::visitIfStmt(const If& stmt) {
 }
 
 void Interpreter::visitFunctionStmt(const Function& stmt) {
-    shared_ptr<LoxFunction> function(new LoxFunction(stmt));
+    shared_ptr<LoxFunction> function(new LoxFunction(stmt, environment));
     Object obj = Object::make_fun_obj(function);
     environment->define(stmt.name.lexeme, obj);
 }

@@ -8,6 +8,7 @@
 #include <string>
 #include "./LoxCallable.hpp"
 #include "./Interpreter.hpp"
+#include "./Environment.hpp"
 #include "./Stmt.hpp"
 #include "./Token.hpp"
 
@@ -18,8 +19,8 @@ using std::string;
 class LoxFunction: public LoxCallable {
  public:
     Function declaration;
-
-    explicit LoxFunction(Function declaration_);
+    shared_ptr<Environment> closure;
+    explicit LoxFunction(Function declaration_, shared_ptr<Environment> closure_);
 
     int arity();
 

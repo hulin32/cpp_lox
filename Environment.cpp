@@ -4,8 +4,8 @@
 #include <string>
 
 #include "./Environment.hpp"
+#include "./RuntimeError.hpp"
 
-using std::runtime_error;
 using std::map;
 using std::string;
 
@@ -24,8 +24,7 @@ Object Environment::get(Token name) {
     if (enclosing != nullptr) {
       return enclosing->get(name);
     }
-    throw runtime_error(name.toString() +
-        "Undefined variable '" + name.lexeme + "'.");
+    throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 }
 
 void Environment::assign(Token name, Object value) {
@@ -39,6 +38,5 @@ void Environment::assign(Token name, Object value) {
       return;
     }
 
-    throw runtime_error(name.toString() +
-        "Undefined variable '" + name.lexeme + "'.");
+    throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 }

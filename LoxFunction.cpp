@@ -14,7 +14,10 @@ using std::shared_ptr;
 using std::vector;
 using std::string;
 
-LoxFunction::LoxFunction(Function declaration_): declaration(declaration_) {}
+LoxFunction::LoxFunction(
+    Function declaration_,
+    shared_ptr<Environment> closure_
+): declaration(declaration_), closure(closure_) {}
 
 int LoxFunction::arity() {
     return declaration.params.size();
@@ -24,8 +27,7 @@ Object LoxFunction::call(
     shared_ptr<Interpreter> interpreter,
     vector<Object> arguments
 ) {
-    shared_ptr<Environment> environment(
-    new Environment(interpreter->globals));
+    shared_ptr<Environment> environment(new Environment(closure));
 
     for (int i = 0; i < declaration.params.size(); i++) {
     environment->define(

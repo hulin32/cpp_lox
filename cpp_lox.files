@@ -8,6 +8,10 @@ Interpreter.hpp
 Parser.cpp
 Parser.hpp
 RuntimeError.hpp
+ReturnError.hpp
+LoxCallable.hpp
+LoxFunction.cpp
+LoxFunction.hpp
 Scanner.cpp
 Scanner.hpp
 Stmt.hpp

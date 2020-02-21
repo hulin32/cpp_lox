@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <iostream>
 #include "./Environment.hpp"
 #include "./Interpreter.hpp"
 #include "./Stmt.hpp"

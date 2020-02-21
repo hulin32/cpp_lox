@@ -245,15 +245,11 @@ void Interpreter::executeBlock(
     shared_ptr<Environment> env
 ) {
     shared_ptr<Environment> previous = environment;
-    try {
-      environment = env;
-      for (auto statement : statements) {
+    environment = env;
+    for (auto statement : statements) {
         execute(statement);
-      }
-      environment = previous;
-    } catch(exception e) {
-      environment = previous;
     }
+    environment = previous;
   }
 
 bool Interpreter::isTruthy(Object object) {

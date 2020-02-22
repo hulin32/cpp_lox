@@ -27,8 +27,12 @@ Object Environment::get(Token name) {
     throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
 }
 
+Object Environment::getAt(int distance, string name) {
+  return ancestor(distance)->values[name];
+}
+
 void Environment::assign(Token name, Object value) {
-  auto search = values.find(name.lexeme);
+    auto search = values.find(name.lexeme);
     if (search != values.end()) {
       search->second = value;
       return;
@@ -39,4 +43,16 @@ void Environment::assign(Token name, Object value) {
     }
 
     throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+}
+
+void Environment::assignAt(int distance, Token name, Object value) {
+    ancestor(distance)->values[name.lexeme] = value;
+}
+
+shared_ptr<Environment> Environment::ancestor(int distance) {
+    shared_ptr<Environment> environment = shared_from_this();
+    for (int i = 0; i < distance; i++) {
+        environment = environment->enclosing;
+    }
+    return environment;
 }

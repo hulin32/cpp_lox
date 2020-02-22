@@ -12,6 +12,8 @@ ReturnError.hpp
 LoxCallable.hpp
 LoxFunction.cpp
 LoxFunction.hpp
+Resolver.hpp
+Resolver.cpp
 Scanner.cpp
 Scanner.hpp
 Stmt.hpp

@@ -14,6 +14,7 @@
 #include "./Stmt.hpp"
 #include "./Interpreter.hpp"
 #include "./RuntimeError.hpp"
+#include "./Resolver.hpp"
 
 
 using std::string;
@@ -73,7 +74,7 @@ void lox::run(string source) {
     shared_ptr<Scanner> scannerObj(new Scanner(source));
     vector<Token> tokens = scannerObj->scanTokens();
     // for (auto token : tokens) {
-        // cout << token.toString() << endl;
+    //     cout << token.toString() << endl;
     // }
     shared_ptr<Parser> parser(new Parser(tokens));
     vector<shared_ptr<Stmt>> statements = parser->parse();
@@ -83,6 +84,10 @@ void lox::run(string source) {
         cout << "no value" << endl;
     } else {
         shared_ptr<Interpreter> interpreter(new Interpreter());
+        shared_ptr<Resolver> resolver(new Resolver(interpreter));
+        resolver->resolve(statements);
+        // Stop if there was a resolution error.
+        if (hadError) return;
         interpreter->interpret(statements);
     }
 }

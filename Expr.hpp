@@ -43,17 +43,17 @@ template <class R>
 class Visitor {
  public:
     virtual ~Visitor() = default;
-    virtual R visitLiteralExpr(const Literal<R>& expr) = 0;
-    virtual R visitAssignExpr(const Assign<R>& expr) = 0;
-    virtual R visitBinaryExpr(const Binary<R>& expr) = 0;
-    virtual R visitGroupingExpr(const Grouping<R>& expr) = 0;
-    virtual R visitUnaryExpr(const Unary<R>& expr) = 0;
-    virtual R visitVariableExpr(const Variable<R>& expr) = 0;
-    virtual R visitLogicalExpr(const Logical<R>& expr) = 0;
-    virtual R visitCallExpr(const Call<R>& expr) = 0;
-    // virtual string visitSetExpr(const Set& expr) = 0;
-    // virtual string visitSuperExpr(const Super& expr) = 0;
-    // virtual string visitThisExpr(const This& expr) = 0;
+    virtual R visitLiteralExpr(shared_ptr<Literal<R>> expr) = 0;
+    virtual R visitAssignExpr(shared_ptr<Assign<R>> expr) = 0;
+    virtual R visitBinaryExpr(shared_ptr<Binary<R>> expr) = 0;
+    virtual R visitGroupingExpr(shared_ptr<Grouping<R>> expr) = 0;
+    virtual R visitUnaryExpr(shared_ptr<Unary<R>> expr) = 0;
+    virtual R visitVariableExpr(shared_ptr<Variable<R>> expr) = 0;
+    virtual R visitLogicalExpr(shared_ptr<Logical<R>> expr) = 0;
+    virtual R visitCallExpr(shared_ptr<Call<R>> expr) = 0;
+    // virtual string visitSetExpr(Set& expr) = 0;
+    // virtual string visitSuperExpr(Super& expr) = 0;
+    // virtual string visitThisExpr(This& expr) = 0;
 };
 
 template<class R>
@@ -64,30 +64,39 @@ class Expr {
 };
 
 template<class R>
-class Literal: public Expr<R> {
+class Literal:
+    public Expr<R>,
+    public std::enable_shared_from_this<Literal<R>>
+{
  public:
     explicit Literal(R value_): value(value_) { }
     R accept(shared_ptr<Visitor<R>> visitor) override {
-        return visitor->visitLiteralExpr(*this);
+        return visitor->visitLiteralExpr(this->shared_from_this());
     }
     R value;
 };
 
 template <class R>
-class Assign: public Expr<R> {
+class Assign:
+    public Expr<R>,
+    public std::enable_shared_from_this<Assign<R>>
+{
  public:
     Assign(Token name_, shared_ptr<Expr<R>> value_):
     name(name_), value(value_) {}
 
     R accept(shared_ptr<Visitor<R>> visitor) override {
-        return visitor->visitAssignExpr(*this);
+        return visitor->visitAssignExpr(this->shared_from_this());
     }
     Token name;
     shared_ptr<Expr<R>> value;
 };
 
 template <class R>
-class Binary: public Expr<R> {
+class Binary:
+    public Expr<R>,
+    public std::enable_shared_from_this<Binary<R>>
+{
  public:
     Binary(
         shared_ptr<Expr<R>> left_,
@@ -96,7 +105,7 @@ class Binary: public Expr<R> {
     left(left_), operation(operation), right(right_) { }
 
     R accept(shared_ptr<Visitor<R>> visitor) override {
-      return visitor->visitBinaryExpr(*this);
+      return visitor->visitBinaryExpr(this->shared_from_this());
     }
     shared_ptr<Expr<R>> left;
     Token operation;
@@ -104,42 +113,54 @@ class Binary: public Expr<R> {
 };
 
 template <class R>
-class Grouping: public Expr<R> {
+class Grouping:
+    public Expr<R>,
+    public std::enable_shared_from_this<Grouping<R>>
+{
  public:
     explicit Grouping(shared_ptr<Expr<R>> expression_):
     expression(expression_) { }
 
     R accept(shared_ptr<Visitor<R>> visitor) override {
-        return visitor->visitGroupingExpr(*this);
+        return visitor->visitGroupingExpr(this->shared_from_this());
     }
     shared_ptr<Expr<R>> expression;
 };
 
 template <class R>
-class Unary: public Expr<R> {
+class Unary:
+    public Expr<R>,
+    public std::enable_shared_from_this<Unary<R>>
+{
  public:
     Unary(Token operation, shared_ptr<Expr<R>> right_):
     operation(operation), right(right_) { }
 
     R accept(shared_ptr<Visitor<R>> visitor) override {
-      return visitor->visitUnaryExpr(*this);
+      return visitor->visitUnaryExpr(this->shared_from_this());
     }
     Token operation;
     shared_ptr<Expr<R>> right;
 };
 
 template <class R>
-class Variable: public Expr<R> {
+class Variable:
+    public Expr<R>,
+    public std::enable_shared_from_this<Variable<R>>
+{
  public:
     explicit Variable(Token name_): name(name_) { }
     R accept(shared_ptr<Visitor<R>> visitor) override {
-        return visitor->visitVariableExpr(*this);
+        return visitor->visitVariableExpr(this->shared_from_this());
     };
     Token name;
 };
 
 template <class R>
-class Logical: public Expr<R> {
+class Logical:
+    public Expr<R>,
+    public std::enable_shared_from_this<Logical<R>>
+{
  public:
     Logical(
         shared_ptr<Expr<R>> left_,
@@ -147,7 +168,7 @@ class Logical: public Expr<R> {
         shared_ptr<Expr<R>> right_):
     left(left_), operation(operation_), right(right_) { }
     R accept(shared_ptr<Visitor<R>> visitor) override {
-        return visitor->visitLogicalExpr(*this);
+        return visitor->visitLogicalExpr(this->shared_from_this());
     };
     shared_ptr<Expr<R>> left;
     Token operation;
@@ -155,7 +176,10 @@ class Logical: public Expr<R> {
 };
 
 template <class R>
-class Call: public Expr<R> {
+class Call:
+    public Expr<R>,
+    public std::enable_shared_from_this<Call<R>>
+{
  public:
     Call(
         shared_ptr<Expr<R>> callee_,
@@ -163,7 +187,7 @@ class Call: public Expr<R> {
         vector<shared_ptr<Expr<R>>> arguments_):
     callee(callee_), paren(paren_), arguments(arguments_) { }
     R accept(shared_ptr<Visitor<R>> visitor) override {
-      return visitor->visitCallExpr(*this);
+      return visitor->visitCallExpr(this->shared_from_this());
     }
     shared_ptr<Expr<R>> callee;
     Token paren;

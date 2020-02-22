@@ -7,6 +7,7 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "./Expr.hpp"
 #include "./Stmt.hpp"
@@ -16,21 +17,23 @@
 using std::shared_ptr;
 using std::string;
 using std::vector;
+using std::map;
 
 class Interpreter:
     public Visitor<Object>,
     public Visitor_Stmt,
-    public std::enable_shared_from_this<Interpreter> {
+    public std::enable_shared_from_this<Interpreter>
+{
  public:
     void interpret(vector<shared_ptr<Stmt>> statements);
-    Object visitLiteralExpr(const Literal<Object>& expr);
-    Object visitAssignExpr(const Assign<Object>& expr);
-    Object visitBinaryExpr(const Binary<Object>& expr);
-    Object visitGroupingExpr(const Grouping<Object>& expr);
-    Object visitUnaryExpr(const Unary<Object>& expr);
-    Object visitVariableExpr(const Variable<Object>& expr);
-    Object visitLogicalExpr(const Logical<Object>& expr);
-    Object visitCallExpr(const Call<Object>& expr);
+    Object visitLiteralExpr(shared_ptr<Literal<Object>> expr);
+    Object visitAssignExpr(shared_ptr<Assign<Object>> expr);
+    Object visitBinaryExpr(shared_ptr<Binary<Object>> expr);
+    Object visitGroupingExpr(shared_ptr<Grouping<Object>> expr);
+    Object visitUnaryExpr(shared_ptr<Unary<Object>> expr);
+    Object visitVariableExpr(shared_ptr<Variable<Object>> expr);
+    Object visitLogicalExpr(shared_ptr<Logical<Object>> expr);
+    Object visitCallExpr(shared_ptr<Call<Object>> expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
@@ -44,9 +47,11 @@ class Interpreter:
         shared_ptr<Environment> environment);
     shared_ptr<Environment> globals
       = shared_ptr<Environment>(new Environment());
+    void resolve(shared_ptr<Expr<Object>> expr, int depth);
  private:
     shared_ptr<Environment> environment
-      = shared_ptr<Environment>(new Environment());
+      = globals;
+    map<shared_ptr<Expr<Object>>, int> locals;
     Object evaluate(shared_ptr<Expr<Object>> expr);
     void execute(shared_ptr<Stmt> stmt);
     bool isTruthy(Object object);
@@ -54,6 +59,7 @@ class Interpreter:
     void checkNumberOperand(Token operation, Object operand);
     void checkNumberOperands(Token operation, Object left, Object right);
     string stringify(Object object);
+    Object lookUpVariable(Token name, shared_ptr<Variable<Object>> expr);
 };
 
 #endif  // INTERPRETER_HPP_

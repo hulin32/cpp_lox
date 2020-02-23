@@ -5,6 +5,8 @@
 
 #include "./Token.hpp"
 #include "./LoxCallable.hpp"
+#include "./LoxInstance.hpp"
+#include "./LoxClass.hpp"
 
 using std::to_string;
 using std::string;
@@ -20,6 +22,10 @@ string Object::toString() {
         return str;
     case Object_fun:
         return "func: ";
+    case Object_class:
+        return lox_class->toString();
+    case Object_instance:
+        return instance->toString();
     default:
         return to_string(num);
     }
@@ -54,10 +60,24 @@ Object Object::make_nil_obj() {
 }
 
 Object Object::make_fun_obj(shared_ptr<LoxCallable> function_) {
-    Object nil_obj;
-    nil_obj.type = Object_fun;
-    nil_obj.function = function_;
-    return nil_obj;
+    Object fun_obj;
+    fun_obj.type = Object_fun;
+    fun_obj.function = function_;
+    return fun_obj;
+}
+
+Object Object::make_instance_obj(shared_ptr<LoxInstance> instance_) {
+    Object class_obj;
+    class_obj.type = Object_instance;
+    class_obj.instance = instance_;
+    return class_obj;
+}
+
+Object Object::make_class_obj(shared_ptr<LoxClass> lox_class_) {
+    Object class_obj;
+    class_obj.type = Object_class;
+    class_obj.lox_class = lox_class_;
+    return class_obj;
 }
 
 Token::Token(TokenType type, string lexeme, Object literal, int line)

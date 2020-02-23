@@ -95,6 +95,11 @@ void Resolver::visitBlockStmt(const Block& stmt) {
     endScope();
 }
 
+void Resolver::visitClassStmt(const Class& stmt) {
+    declare(stmt.name);
+    define(stmt.name);
+}
+
 void Resolver::visitIfStmt(const If& stmt) {
     resolve(stmt.condition);
     resolve(stmt.thenBranch);

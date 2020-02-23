@@ -56,6 +56,7 @@ class Parser {
     shared_ptr<Stmt> expressionStatement();
     shared_ptr<Stmt> function(string kind);
     shared_ptr<Stmt> declaration();
+    shared_ptr<Stmt> classDeclaration();
     shared_ptr<Stmt> varDeclaration();
     vector<shared_ptr<Stmt>> block();
 };

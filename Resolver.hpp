@@ -37,6 +37,7 @@ class Resolver:
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
     void visitBlockStmt(const Block& stmt);
+    void visitClassStmt(const Class& stmt);
     void visitIfStmt(const If& stmt);
     void visitWhileStmt(const While& stmt);
     void visitFunctionStmt(const Function& stmt);

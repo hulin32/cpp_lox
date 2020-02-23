@@ -10,6 +10,8 @@ using std::string;
 using std::shared_ptr;
 
 class LoxCallable;
+class LoxInstance;
+class LoxClass;
 
 typedef enum {
   LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
@@ -39,6 +41,8 @@ class Object {
       Object_bool,
       Object_nil,
       Object_fun,
+      Object_instance,
+      Object_class,
     } Object_type;
     string str;
     double num;
@@ -47,11 +51,15 @@ class Object {
     Object_type type;
     string toString();
     shared_ptr<LoxCallable> function;
+    shared_ptr<LoxInstance> instance;
+    shared_ptr<LoxClass> lox_class;
     static Object make_num_obj(double num);
     static Object make_str_obj(string str);
     static Object make_bool_obj(bool boolean);
     static Object make_nil_obj();
     static Object make_fun_obj(shared_ptr<LoxCallable> function_);
+    static Object make_instance_obj(shared_ptr<LoxInstance> instance_);
+    static Object make_class_obj(shared_ptr<LoxClass> lox_class_);
 };
 
 class Token {

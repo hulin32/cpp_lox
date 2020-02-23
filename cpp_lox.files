@@ -14,6 +14,10 @@ LoxFunction.cpp
 LoxFunction.hpp
 Resolver.hpp
 Resolver.cpp
+LoxClass.cpp
+LoxClass.hpp
+LoxInstance.cpp
+LoxInstance.hpp
 Scanner.cpp
 Scanner.hpp
 Stmt.hpp

@@ -3,9 +3,12 @@
 /*
 program     → declaration* EOF ;
 
-declaration → funDecl
+declaration → classDecl 
+            |funDecl
             | varDecl
             | statement ;
+
+classDecl   → "class" IDENTIFIER "{" function* "}" ;
 
 funDecl  → "fun" function ;
 function → IDENTIFIER "(" parameters? ")" block ;
@@ -59,6 +62,7 @@ class If;
 class While;
 class Function;
 class Return;
+class Class;
 
 class Visitor_Stmt {
  public:
@@ -71,6 +75,7 @@ class Visitor_Stmt {
     virtual void visitWhileStmt(const While& stmt) = 0;
     virtual void visitFunctionStmt(const Function& stmt) = 0;
     virtual void visitReturnStmt(const Return& stmt) = 0;
+    virtual void visitClassStmt(const Class& stmt) = 0;
 };
 
 class Stmt {
@@ -179,6 +184,17 @@ class Return: public Stmt {
     }
     Token name;
     shared_ptr<Expr<Object>> value;
+};
+
+class Class: public Stmt {
+ public:
+    Class(Token name_, vector<shared_ptr<Stmt>> function_):
+    name(name_), function(function_) { }
+    void accept(shared_ptr<Visitor_Stmt> visitor) override {
+        visitor->visitClassStmt(*this);
+    }
+    Token name;
+    vector<shared_ptr<Stmt>> function;
 };
 
 #endif  // STMT_HPP_

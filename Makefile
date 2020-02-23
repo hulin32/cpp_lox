@@ -1,21 +1,20 @@
 CXXFLAGS=-g -std=c++11 -Wall -pedantic
 CXX = g++
 
-all: main test demo
+all: main
 
+LoxInstance.o:	LoxInstance.cpp LoxInstance.hpp
+LoxClass.o:	LoxClass.cpp LoxClass.hpp
 Resolver.o:	Resolver.cpp Resolver.hpp
 Token.o:	Token.cpp Token.hpp
 LoxFunction.o: LoxFunction.cpp LoxFunction.hpp
 Environment.o: Environment.cpp Environment.hpp
-Interpreter.o:	Interpreter.cpp Interpreter.hpp Environment.o LoxFunction.o
-lox.o:	lox.cpp lox.hpp Interpreter.o Resolver.o
+Interpreter.o:	Interpreter.cpp Interpreter.hpp
+lox.o:	lox.cpp lox.hpp
 Parser.o:	Parser.cpp Parser.hpp
 Scanner.o:	Scanner.cpp Scanner.hpp
-AstPrinter.o: AstPrinter.hpp AstPrinter.cpp
 
-main: main.cpp lox.o LoxFunction.o Token.o Scanner.o Parser.o Interpreter.o Environment.o Resolver.o
-test: test.cpp AstPrinter.o Token.o
-demo: demo.cpp
+main: main.cpp lox.o LoxFunction.o Token.o Scanner.o Parser.o Interpreter.o Environment.o Resolver.o LoxClass.o LoxInstance.o
 
 clean:
 	rm -f *.o main

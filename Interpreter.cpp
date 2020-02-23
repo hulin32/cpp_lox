@@ -15,6 +15,7 @@
 #include "./LoxCallable.hpp"
 #include "./LoxFunction.hpp"
 #include "./ReturnError.hpp"
+#include "./LoxClass.hpp"
 #include "./lox.hpp"
 
 using std::stod;
@@ -184,18 +185,24 @@ Object Interpreter::visitCallExpr(shared_ptr<Call<Object>> expr) {
       arguments.push_back(evaluate(argument));
     }
 
-    if (callee.type != Object::Object_fun) {
+    if (callee.type != Object::Object_fun && callee.type != Object::Object_class) {
         throw RuntimeError(expr->paren,
           "Can only call functions and classes.");
     }
 
-    shared_ptr<LoxCallable> function = callee.function;
-    if (arguments.size() != function->arity()) {
+    shared_ptr<LoxCallable> callable;
+    if (callee.type == Object::Object_fun) {
+        callable = callee.function;
+    }
+    if (callee.type == Object::Object_class) {
+        callable = callee.lox_class;
+    }
+    if (arguments.size() != callable->arity()) {
       throw RuntimeError(expr->paren, "Expected " +
-          to_string(function->arity()) + " arguments but got " +
+          to_string(callable->arity()) + " arguments but got " +
           to_string(arguments.size()) + ".");
     }
-    return function->call(shared_from_this(), arguments);
+    return callable->call(shared_from_this(), arguments);
 }
 
 void Interpreter::visitExpressionStmt(const Expression& stmt) {
@@ -224,6 +231,12 @@ void Interpreter::visitVarStmt(const Var& stmt) {
 void Interpreter::visitBlockStmt(const Block& stmt) {
     shared_ptr<Environment> env(new Environment(environment));
     executeBlock(stmt.statements, env);
+}
+
+void Interpreter::visitClassStmt(const Class& stmt) {
+    environment->define(stmt.name.lexeme, Object::make_nil_obj());
+    auto klass = shared_ptr<LoxClass>(new LoxClass(stmt.name.lexeme));
+    environment->assign(stmt.name, Object::make_class_obj(klass));
 }
 
 void Interpreter::visitWhileStmt(const While& stmt) {

@@ -4,13 +4,19 @@
 #define LOXINSTANCE_HPP_
 
 #include <string>
+#include <map>
 #include "./LoxClass.hpp"
+#include "./Token.hpp"
 
 using std::string;
+using std::map;
 
 class LoxInstance {
  public:
     LoxClass klass;
+    map<string, Object> fields;
+    Object get(Token name);
+    void set(Token name, Object value);
     explicit LoxInstance(LoxClass klass_);
     string toString();
 };

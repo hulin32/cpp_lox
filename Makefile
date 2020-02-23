@@ -3,10 +3,10 @@ CXX = g++
 
 all: main
 
+Token.o:	Token.cpp Token.hpp
 LoxInstance.o:	LoxInstance.cpp LoxInstance.hpp
 LoxClass.o:	LoxClass.cpp LoxClass.hpp
 Resolver.o:	Resolver.cpp Resolver.hpp
-Token.o:	Token.cpp Token.hpp
 LoxFunction.o: LoxFunction.cpp LoxFunction.hpp
 Environment.o: Environment.cpp Environment.hpp
 Interpreter.o:	Interpreter.cpp Interpreter.hpp

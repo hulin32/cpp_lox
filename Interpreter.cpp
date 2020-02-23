@@ -13,9 +13,10 @@
 #include "./RuntimeError.hpp"
 #include "./Environment.hpp"
 #include "./LoxCallable.hpp"
+#include "./LoxInstance.hpp"
+#include "./LoxClass.hpp"
 #include "./LoxFunction.hpp"
 #include "./ReturnError.hpp"
-#include "./LoxClass.hpp"
 #include "./lox.hpp"
 
 using std::stod;
@@ -168,7 +169,8 @@ Object Interpreter::visitVariableExpr(shared_ptr<Variable<Object>> expr) {
     return lookUpVariable(expr->name, expr);
 }
 
-Object Interpreter::lookUpVariable(Token name, shared_ptr<Variable<Object>> expr) {
+Object Interpreter::lookUpVariable(
+    Token name, shared_ptr<Variable<Object>> expr) {
     auto distance = locals.find(expr);
     if (distance != locals.end()) {
       return environment->getAt(distance->second, name.lexeme);
@@ -185,7 +187,8 @@ Object Interpreter::visitCallExpr(shared_ptr<Call<Object>> expr) {
       arguments.push_back(evaluate(argument));
     }
 
-    if (callee.type != Object::Object_fun && callee.type != Object::Object_class) {
+    if (callee.type != Object::Object_fun &&
+        callee.type != Object::Object_class) {
         throw RuntimeError(expr->paren,
           "Can only call functions and classes.");
     }
@@ -204,6 +207,29 @@ Object Interpreter::visitCallExpr(shared_ptr<Call<Object>> expr) {
     }
     return callable->call(shared_from_this(), arguments);
 }
+
+Object Interpreter::visitGetExpr(shared_ptr<Get<Object>> expr) {
+    Object object = evaluate(expr->object);
+    if (object.type == Object::Object_instance) {
+       return (object.instance)->get(expr->name);
+    }
+
+    throw RuntimeError(expr->name,
+        "Only instances have properties.");
+}
+
+Object Interpreter::visitSetExpr(shared_ptr<Set<Object>> expr) {
+    Object object = evaluate(expr->object);
+
+    if (object.type != Object::Object_instance) {
+      throw RuntimeError(expr->name, "Only instances have fields.");
+    }
+
+    Object value = evaluate(expr->value);
+    value.instance->set(expr->name, value);
+    return value;
+}
+
 
 void Interpreter::visitExpressionStmt(const Expression& stmt) {
     evaluate(stmt.expression);
@@ -235,7 +261,14 @@ void Interpreter::visitBlockStmt(const Block& stmt) {
 
 void Interpreter::visitClassStmt(const Class& stmt) {
     environment->define(stmt.name.lexeme, Object::make_nil_obj());
-    auto klass = shared_ptr<LoxClass>(new LoxClass(stmt.name.lexeme));
+
+    map<string, shared_ptr<LoxFunction>> methods;
+    for (auto method : stmt.methods) {
+        shared_ptr<LoxFunction> function(new LoxFunction(method, environment));
+      methods[method->name.lexeme] = function;
+    }
+
+    auto klass = shared_ptr<LoxClass>(new LoxClass(stmt.name.lexeme, methods));
     environment->assign(stmt.name, Object::make_class_obj(klass));
 }
 
@@ -254,10 +287,10 @@ void Interpreter::visitIfStmt(const If& stmt) {
     }
 }
 
-void Interpreter::visitFunctionStmt(const Function& stmt) {
+void Interpreter::visitFunctionStmt(shared_ptr<Function> stmt) {
     shared_ptr<LoxFunction> function(new LoxFunction(stmt, environment));
     Object obj = Object::make_fun_obj(function);
-    environment->define(stmt.name.lexeme, obj);
+    environment->define(stmt->name.lexeme, obj);
 }
 
 Object Interpreter::evaluate(shared_ptr<Expr<Object>> expr) {

@@ -73,7 +73,7 @@ class Visitor_Stmt {
     virtual void visitBlockStmt(const Block& stmt) = 0;
     virtual void visitIfStmt(const If& stmt) = 0;
     virtual void visitWhileStmt(const While& stmt) = 0;
-    virtual void visitFunctionStmt(const Function& stmt) = 0;
+    virtual void visitFunctionStmt(shared_ptr<Function> stmt) = 0;
     virtual void visitReturnStmt(const Return& stmt) = 0;
     virtual void visitClassStmt(const Class& stmt) = 0;
 };
@@ -158,7 +158,10 @@ class While: public Stmt {
     shared_ptr<Stmt> body;
 };
 
-class Function: public Stmt {
+class Function:
+    public Stmt,
+    public std::enable_shared_from_this<Function>
+{
  public:
     Function(
         Token name_,
@@ -168,7 +171,7 @@ class Function: public Stmt {
         params(params_),
         body(body_) { }
     void accept(shared_ptr<Visitor_Stmt> visitor) override {
-        visitor->visitFunctionStmt(*this);
+        visitor->visitFunctionStmt(this->shared_from_this());
     }
     Token name;
     vector<Token> params;
@@ -188,13 +191,13 @@ class Return: public Stmt {
 
 class Class: public Stmt {
  public:
-    Class(Token name_, vector<shared_ptr<Stmt>> function_):
-    name(name_), function(function_) { }
+    Class(Token name_, vector<shared_ptr<Function>> methods_):
+    name(name_), methods(methods_) { }
     void accept(shared_ptr<Visitor_Stmt> visitor) override {
         visitor->visitClassStmt(*this);
     }
     Token name;
-    vector<shared_ptr<Stmt>> function;
+    vector<shared_ptr<Function>> methods;
 };
 
 #endif  // STMT_HPP_

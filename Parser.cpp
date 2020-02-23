@@ -7,15 +7,15 @@ comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
 addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
 multiplication → unary ( ( "/" | "*" ) unary )* ;
 unary → ( "!" | "-" ) unary | call ;
-call  → primary ( "(" arguments? ")" )* ;
+call → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 arguments → expression ( "," expression )* ;
 primary        → "false" | "true" | "nil"
                | NUMBER | STRING
                | "(" expression ")"
                | IDENTIFIER ;
 expression → assignment ;
-assignment → identifier "=" assignment
-           | logic_or ;
+assignment → ( call "." )? IDENTIFIER "=" assignment
+           | logic_or;
 logic_or   → logic_and ( "or" logic_and )* ;
 logic_and  → equality ( "and" equality )* ;
 */
@@ -49,9 +49,15 @@ shared_ptr<Expr<Object>> Parser::assignment() {
     shared_ptr<Expr<Object>> value = assignment();
 
     auto variable = dynamic_cast<Variable<Object>*>(expr.get());
+    auto get = dynamic_cast<Get<Object>*>(expr.get());
     if (variable != nullptr) {
       Token name = variable->name;
-      return shared_ptr<Expr<Object>>(new Assign<Object>(name, value));
+      return shared_ptr<Expr<Object>>(
+        new Assign<Object>(name, value));
+    }
+    if (get != nullptr) {
+      return shared_ptr<Expr<Object>>(
+        new Set<Object>(get->object, get->name, value));
     }
     error(equals, "Invalid assignment target.");
   }
@@ -193,7 +199,7 @@ shared_ptr<Stmt> Parser::expressionStatement() {
   return expression;
 }
 
-shared_ptr<Stmt> Parser::function(string kind) {
+shared_ptr<Function> Parser::function(string kind) {
     Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
     consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
     vector<Token> parameters;
@@ -208,7 +214,7 @@ shared_ptr<Stmt> Parser::function(string kind) {
     consume(RIGHT_PAREN, "Expect ')' after parameters.");
     consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
     vector<shared_ptr<Stmt>> body = block();
-    return shared_ptr<Stmt>(new Function(name, parameters, body));
+    return shared_ptr<Function>(new Function(name, parameters, body));
   }
 
 vector<shared_ptr<Stmt>> Parser::block() {
@@ -297,6 +303,9 @@ shared_ptr<Expr<Object>> Parser::call() {
     while (true) {
       if (match({ LEFT_PAREN })) {
         expr = finishCall(expr);
+      } else if (match({ DOT })) {
+        Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+        expr = shared_ptr<Expr<Object>>(new Get<Object>(expr, name));
       } else {
         break;
       }
@@ -437,7 +446,7 @@ shared_ptr<Stmt> Parser::classDeclaration() {
     Token name = consume(IDENTIFIER, "Expect class name.");
     consume(LEFT_BRACE, "Expect '{' before class body.");
 
-    vector<shared_ptr<Stmt>> methods;
+    vector<shared_ptr<Function>> methods;
     while (!check(RIGHT_BRACE) && !isAtEnd()) {
       methods.push_back(function("method"));
     }

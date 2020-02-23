@@ -33,6 +33,8 @@ class Resolver:
     Object visitVariableExpr(shared_ptr<Variable<Object>> expr);
     Object visitLogicalExpr(shared_ptr<Logical<Object>> expr);
     Object visitCallExpr(shared_ptr<Call<Object>> expr);
+    Object visitGetExpr(shared_ptr<Get<Object>> expr);
+    Object visitSetExpr(shared_ptr<Set<Object>> expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
@@ -40,7 +42,7 @@ class Resolver:
     void visitClassStmt(const Class& stmt);
     void visitIfStmt(const If& stmt);
     void visitWhileStmt(const While& stmt);
-    void visitFunctionStmt(const Function& stmt);
+    void visitFunctionStmt(shared_ptr<Function> stmt);
     void visitReturnStmt(const Return& stmt);
     void resolve(vector<shared_ptr<Stmt>> statements);
     void resolve(shared_ptr<Stmt> stmt);
@@ -48,7 +50,8 @@ class Resolver:
  private:
     enum FunctionType {
         NONE,
-        FUNCTION
+        FUNCTION,
+        METHOD
     };
     FunctionType currentFunction = NONE;
     void beginScope();
@@ -56,7 +59,7 @@ class Resolver:
     void declare(Token name);
     void define(Token name);
     void resolveLocal(shared_ptr<Expr<Object>>, Token name);
-    void resolveFunction(Function function, FunctionType type);
+    void resolveFunction(shared_ptr<Function> function, FunctionType type);
 };
 
 #endif  // RESOLVER_HPP_

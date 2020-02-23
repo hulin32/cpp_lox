@@ -16,12 +16,12 @@ using std::vector;
 using std::string;
 
 LoxFunction::LoxFunction(
-    Function declaration_,
+    shared_ptr<Function> declaration_,
     shared_ptr<Environment> closure_
 ): declaration(declaration_), closure(closure_) {}
 
 int LoxFunction::arity() {
-    return declaration.params.size();
+    return declaration->params.size();
 }
 
 Object LoxFunction::call(
@@ -30,14 +30,14 @@ Object LoxFunction::call(
 ) {
     shared_ptr<Environment> environment(new Environment(closure));
 
-    for (int i = 0; i < declaration.params.size(); i++) {
+    for (int i = 0; i < declaration->params.size(); i++) {
     environment->define(
-        declaration.params[i].lexeme,
+        declaration->params[i].lexeme,
         arguments[i]);
     }
 
     try {
-        interpreter->executeBlock(declaration.body, environment);
+        interpreter->executeBlock(declaration->body, environment);
     } catch (ReturnError returnValue) {
         return returnValue.value;
     }
@@ -45,5 +45,5 @@ Object LoxFunction::call(
 }
 
 string LoxFunction::toString() {
-    return "<fn " + declaration.name.lexeme + ">";
+    return "<fn " + declaration->name.lexeme + ">";
 }

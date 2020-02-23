@@ -72,6 +72,16 @@ Object Resolver::visitCallExpr(shared_ptr<Call<Object>> expr) {
     }
     return Object::make_nil_obj();
 }
+Object Resolver::visitGetExpr(shared_ptr<Get<Object>> expr) {
+    resolve(expr->object);
+    return Object::make_nil_obj();
+}
+
+Object Resolver::visitSetExpr(shared_ptr<Set<Object>> expr) {
+    resolve(expr->value);
+    resolve(expr->object);
+    return Object::make_nil_obj();
+}
 
 void Resolver::visitExpressionStmt(const Expression& stmt) {
     resolve(stmt.expression);
@@ -98,6 +108,11 @@ void Resolver::visitBlockStmt(const Block& stmt) {
 void Resolver::visitClassStmt(const Class& stmt) {
     declare(stmt.name);
     define(stmt.name);
+
+    for (auto method : stmt.methods) {
+      FunctionType declaration = METHOD;
+      resolveFunction(method, declaration);
+    }
 }
 
 void Resolver::visitIfStmt(const If& stmt) {
@@ -113,9 +128,9 @@ void Resolver::visitWhileStmt(const While& stmt) {
     resolve(stmt.body);
 }
 
-void Resolver::visitFunctionStmt(const Function& stmt) {
-    declare(stmt.name);
-    define(stmt.name);
+void Resolver::visitFunctionStmt(shared_ptr<Function> stmt) {
+    declare(stmt->name);
+    define(stmt->name);
     resolveFunction(stmt, FUNCTION);
 }
 
@@ -185,18 +200,18 @@ void Resolver::resolveLocal(shared_ptr<Expr<Object>> expr, Token name) {
 }
 
 void Resolver::resolveFunction(
-    Function function,
+    shared_ptr<Function> function,
     FunctionType type
 ) {
     FunctionType enclosingFunction = currentFunction;
     currentFunction = type;
 
     beginScope();
-    for (Token param : function.params) {
+    for (Token param : function->params) {
       declare(param);
       define(param);
     }
-    resolve(function.body);
+    resolve(function->body);
     endScope();
     currentFunction = enclosingFunction;
 }

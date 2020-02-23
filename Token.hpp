@@ -10,8 +10,8 @@ using std::string;
 using std::shared_ptr;
 
 class LoxCallable;
-class LoxInstance;
 class LoxClass;
+class LoxInstance;
 
 typedef enum {
   LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,

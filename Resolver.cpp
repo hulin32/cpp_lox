@@ -83,6 +83,16 @@ Object Resolver::visitSetExpr(shared_ptr<Set<Object>> expr) {
     return Object::make_nil_obj();
 }
 
+Object Resolver::visitThisExpr(shared_ptr<This<Object>> expr) {
+    if (currentClass == CLASS_NONE) {
+        lox::error(expr->keyword.line,
+          "Cannot use 'this' outside of a class.");
+        return Object::make_nil_obj();
+    }
+    resolveLocal(expr, expr->keyword);
+    return Object::make_nil_obj();
+}
+
 void Resolver::visitExpressionStmt(const Expression& stmt) {
     resolve(stmt.expression);
 }
@@ -106,13 +116,26 @@ void Resolver::visitBlockStmt(const Block& stmt) {
 }
 
 void Resolver::visitClassStmt(const Class& stmt) {
+    ClassType enclosingClass = currentClass;
+    currentClass = CLASS;
+
     declare(stmt.name);
     define(stmt.name);
+
+    beginScope();
+    auto back = scopes.back();
+    back["this"] = true;
+    scopes.pop_back();
+    scopes.emplace_back(back);
 
     for (auto method : stmt.methods) {
       FunctionType declaration = METHOD;
       resolveFunction(method, declaration);
     }
+
+    endScope();
+
+    currentClass = enclosingClass;
 }
 
 void Resolver::visitIfStmt(const If& stmt) {
@@ -135,7 +158,7 @@ void Resolver::visitFunctionStmt(shared_ptr<Function> stmt) {
 }
 
 void Resolver::visitReturnStmt(const Return& stmt) {
-    if (currentFunction == NONE) {
+    if (currentFunction == FUNCTION_NONE) {
       lox::error(stmt.name.line, "Cannot return from top-level code.");
     }
 

@@ -23,7 +23,7 @@ Object LoxInstance::get(Token name) {
 
     shared_ptr<LoxFunction> method = klass.findMethod(name.lexeme);
     if (method != nullptr) {
-        return Object::make_fun_obj(method);
+        return Object::make_fun_obj(method->bind(shared_from_this()));
     }
 
     throw RuntimeError(name,

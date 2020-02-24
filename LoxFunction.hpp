@@ -32,6 +32,7 @@ class LoxFunction: public LoxCallable {
       vector<Object> arguments
     );
 
+    shared_ptr<LoxFunction> bind(shared_ptr<LoxInstance> instance);
     string toString();
 };
 

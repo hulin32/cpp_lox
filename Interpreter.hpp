@@ -36,6 +36,7 @@ class Interpreter:
     Object visitCallExpr(shared_ptr<Call<Object>> expr);
     Object visitGetExpr(shared_ptr<Get<Object>> expr);
     Object visitSetExpr(shared_ptr<Set<Object>> expr);
+    Object visitThisExpr(shared_ptr<This<Object>> expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
@@ -62,7 +63,7 @@ class Interpreter:
     void checkNumberOperand(Token operation, Object operand);
     void checkNumberOperands(Token operation, Object left, Object right);
     string stringify(Object object);
-    Object lookUpVariable(Token name, shared_ptr<Variable<Object>> expr);
+    Object lookUpVariable(Token name, shared_ptr<Expr<Object>> expr);
 };
 
 #endif  // INTERPRETER_HPP_

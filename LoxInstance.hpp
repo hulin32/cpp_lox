@@ -4,6 +4,7 @@
 #define LOXINSTANCE_HPP_
 
 #include <string>
+#include <memory>
 #include <map>
 #include "./LoxClass.hpp"
 #include "./Token.hpp"
@@ -11,7 +12,7 @@
 using std::string;
 using std::map;
 
-class LoxInstance {
+class LoxInstance: public std::enable_shared_from_this<LoxInstance> {
  public:
     LoxClass klass;
     map<string, Object> fields;

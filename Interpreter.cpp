@@ -170,7 +170,7 @@ Object Interpreter::visitVariableExpr(shared_ptr<Variable<Object>> expr) {
 }
 
 Object Interpreter::lookUpVariable(
-    Token name, shared_ptr<Variable<Object>> expr) {
+    Token name, shared_ptr<Expr<Object>> expr) {
     auto distance = locals.find(expr);
     if (distance != locals.end()) {
       return environment->getAt(distance->second, name.lexeme);
@@ -226,10 +226,13 @@ Object Interpreter::visitSetExpr(shared_ptr<Set<Object>> expr) {
     }
 
     Object value = evaluate(expr->value);
-    value.instance->set(expr->name, value);
+    object.instance->set(expr->name, value);
     return value;
 }
 
+Object Interpreter::visitThisExpr(shared_ptr<This<Object>> expr) {
+    return lookUpVariable(expr->keyword, expr);
+}
 
 void Interpreter::visitExpressionStmt(const Expression& stmt) {
     evaluate(stmt.expression);

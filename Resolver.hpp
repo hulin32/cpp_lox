@@ -35,6 +35,7 @@ class Resolver:
     Object visitCallExpr(shared_ptr<Call<Object>> expr);
     Object visitGetExpr(shared_ptr<Get<Object>> expr);
     Object visitSetExpr(shared_ptr<Set<Object>> expr);
+    Object visitThisExpr(shared_ptr<This<Object>> expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
@@ -49,11 +50,16 @@ class Resolver:
     void resolve(shared_ptr<Expr<Object>> expr);
  private:
     enum FunctionType {
-        NONE,
+        FUNCTION_NONE,
         FUNCTION,
         METHOD
     };
-    FunctionType currentFunction = NONE;
+    enum ClassType {
+        CLASS_NONE,
+        CLASS
+    };
+    ClassType currentClass = CLASS_NONE;
+    FunctionType currentFunction = FUNCTION_NONE;
     void beginScope();
     void endScope();
     void declare(Token name);

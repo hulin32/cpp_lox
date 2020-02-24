@@ -336,6 +336,10 @@ shared_ptr<Expr<Object>> Parser::primary() {
         new Literal<Object>(Object::make_str_obj(previous().literal.str)));
     }
 
+    if (match({ THIS })) {
+      return shared_ptr<Expr<Object>>(new This<Object>(previous()));
+    }
+
     if (match({ IDENTIFIER })) {
       return shared_ptr<Expr<Object>>(
         new Variable<Object>(previous()));

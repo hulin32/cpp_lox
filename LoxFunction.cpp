@@ -10,6 +10,7 @@
 #include "./Token.hpp"
 #include "./ReturnError.hpp"
 #include "./LoxFunction.hpp"
+#include "./LoxInstance.hpp"
 
 using std::shared_ptr;
 using std::vector;
@@ -46,4 +47,10 @@ Object LoxFunction::call(
 
 string LoxFunction::toString() {
     return "<fn " + declaration->name.lexeme + ">";
+}
+
+shared_ptr<LoxFunction> LoxFunction::bind(shared_ptr<LoxInstance> instance) {
+    shared_ptr<Environment> environment(new Environment(closure));
+    environment->define("this", Object::make_instance_obj(instance));
+    return shared_ptr<LoxFunction> (new LoxFunction(declaration, environment));
 }

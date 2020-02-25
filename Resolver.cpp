@@ -130,6 +130,9 @@ void Resolver::visitClassStmt(const Class& stmt) {
 
     for (auto method : stmt.methods) {
       FunctionType declaration = METHOD;
+      if (method->name.lexeme == "init") {
+        declaration = INITIALIZER;
+      }
       resolveFunction(method, declaration);
     }
 
@@ -163,7 +166,11 @@ void Resolver::visitReturnStmt(const Return& stmt) {
     }
 
     if (stmt.value != nullptr) {
-      resolve(stmt.value);
+        if (currentFunction == INITIALIZER) {
+            lox::error(stmt.name.line,
+                "Cannot return a value from an initializer.");
+        }
+        resolve(stmt.value);
     }
 }
 

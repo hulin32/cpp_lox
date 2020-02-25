@@ -267,8 +267,12 @@ void Interpreter::visitClassStmt(const Class& stmt) {
 
     map<string, shared_ptr<LoxFunction>> methods;
     for (auto method : stmt.methods) {
-        shared_ptr<LoxFunction> function(new LoxFunction(method, environment));
-      methods[method->name.lexeme] = function;
+        bool is_init = method->name.lexeme == "init";
+        shared_ptr<LoxFunction> function(
+            new LoxFunction(method, environment, is_init)
+        );
+
+        methods[method->name.lexeme] = function;
     }
 
     auto klass = shared_ptr<LoxClass>(new LoxClass(stmt.name.lexeme, methods));
@@ -291,7 +295,7 @@ void Interpreter::visitIfStmt(const If& stmt) {
 }
 
 void Interpreter::visitFunctionStmt(shared_ptr<Function> stmt) {
-    shared_ptr<LoxFunction> function(new LoxFunction(stmt, environment));
+    shared_ptr<LoxFunction> function(new LoxFunction(stmt, environment, false));
     Object obj = Object::make_fun_obj(function);
     environment->define(stmt->name.lexeme, obj);
 }

@@ -52,7 +52,8 @@ class Resolver:
     enum FunctionType {
         FUNCTION_NONE,
         FUNCTION,
-        METHOD
+        METHOD,
+        INITIALIZER
     };
     enum ClassType {
         CLASS_NONE,

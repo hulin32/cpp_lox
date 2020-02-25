@@ -18,11 +18,13 @@ using std::string;
 
 class LoxFunction: public LoxCallable {
  public:
+    bool isInitializer;
     shared_ptr<Function> declaration;
     shared_ptr<Environment> closure;
     explicit LoxFunction(
       shared_ptr<Function> declaration_,
-      shared_ptr<Environment> closure_
+      shared_ptr<Environment> closure_,
+      bool isInitializer_
     );
 
     int arity();

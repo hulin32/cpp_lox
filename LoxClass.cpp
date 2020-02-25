@@ -22,11 +22,17 @@ Object LoxClass::call(
         shared_ptr<Interpreter> interpreter,
         vector<Object> arguments) {
     auto instance = shared_ptr<LoxInstance>(new LoxInstance(*this));
+    shared_ptr<LoxFunction> initializer = findMethod("init");
+    if (initializer != nullptr) {
+      initializer->bind(instance)->call(interpreter, arguments);
+    }
     return Object::make_instance_obj(instance);
 }
 
 int LoxClass::arity() {
-    return 0;
+    shared_ptr<LoxFunction> initializer = findMethod("init");
+    if (initializer == nullptr) return 0;
+    return initializer->arity();
 }
 string LoxClass::toString() {
     return name;

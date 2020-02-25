@@ -8,7 +8,8 @@ declaration → classDecl
             | varDecl
             | statement ;
 
-classDecl   → "class" IDENTIFIER "{" function* "}" ;
+classDecl → "class" IDENTIFIER ( "<" IDENTIFIER )?
+            "{" function* "}" ;
 
 funDecl  → "fun" function ;
 function → IDENTIFIER "(" parameters? ")" block ;
@@ -191,12 +192,17 @@ class Return: public Stmt {
 
 class Class: public Stmt {
  public:
-    Class(Token name_, vector<shared_ptr<Function>> methods_):
-    name(name_), methods(methods_) { }
+    Class(
+        Token name_,
+        shared_ptr<Variable<Object>> superclass_,
+        vector<shared_ptr<Function>> methods_
+    ):
+    name(name_), superclass(superclass_), methods(methods_) { }
     void accept(shared_ptr<Visitor_Stmt> visitor) override {
         visitor->visitClassStmt(*this);
     }
     Token name;
+    shared_ptr<Variable<Object>> superclass;
     vector<shared_ptr<Function>> methods;
 };
 

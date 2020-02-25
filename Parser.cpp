@@ -448,6 +448,12 @@ shared_ptr<Stmt> Parser::declaration() {
 
 shared_ptr<Stmt> Parser::classDeclaration() {
     Token name = consume(IDENTIFIER, "Expect class name.");
+
+    shared_ptr<Variable<Object>> superclass;
+    if (match({ LESS })) {
+      consume(IDENTIFIER, "Expect superclass name.");
+      superclass = shared_ptr<Variable<Object>>(new Variable<Object>(previous()));
+    }
     consume(LEFT_BRACE, "Expect '{' before class body.");
 
     vector<shared_ptr<Function>> methods;
@@ -456,7 +462,7 @@ shared_ptr<Stmt> Parser::classDeclaration() {
     }
     consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-    return shared_ptr<Stmt>(new Class(name, methods));
+    return shared_ptr<Stmt>(new Class(name, superclass, methods));
 }
 
 vector<shared_ptr<Stmt>> Parser::parse() {

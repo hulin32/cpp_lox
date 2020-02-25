@@ -20,10 +20,12 @@ using std::map;
 class LoxClass: public LoxCallable {
  public:
     string name;
+    shared_ptr<LoxClass> superclass;
     map<string, shared_ptr<LoxFunction>> methods;
     shared_ptr<LoxFunction> findMethod(string name);
     explicit LoxClass(
         string name_,
+        shared_ptr<LoxClass> superclass_,
         map<string, shared_ptr<LoxFunction>> methods_);
 
     Object call(

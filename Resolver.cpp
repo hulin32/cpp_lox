@@ -122,6 +122,16 @@ void Resolver::visitClassStmt(const Class& stmt) {
     declare(stmt.name);
     define(stmt.name);
 
+    if (stmt.superclass != nullptr &&
+        stmt.name.lexeme == stmt.superclass->name.lexeme) {
+      lox::error(stmt.superclass->name.line,
+          "A class cannot inherit from itself.");
+    }
+
+    if (stmt.superclass != nullptr) {
+      resolve(stmt.superclass);
+    }
+
     beginScope();
     auto back = scopes.back();
     back["this"] = true;

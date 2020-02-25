@@ -15,8 +15,11 @@ using std::shared_ptr;
 using std::vector;
 
 
-LoxClass::LoxClass(string name_, map<string, shared_ptr<LoxFunction>> methods_):
-    name(name_), methods(methods_) {}
+LoxClass::LoxClass(
+    string name_,
+    shared_ptr<LoxClass> superclass_,
+    map<string, shared_ptr<LoxFunction>> methods_
+): name(name_), superclass(superclass_), methods(methods_) {}
 
 Object LoxClass::call(
         shared_ptr<Interpreter> interpreter,

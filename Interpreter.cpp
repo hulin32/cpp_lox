@@ -263,6 +263,15 @@ void Interpreter::visitBlockStmt(const Block& stmt) {
 }
 
 void Interpreter::visitClassStmt(const Class& stmt) {
+    Object superclass;
+    if (stmt.superclass != nullptr) {
+      superclass = evaluate(stmt.superclass);
+      if (superclass.type != Object::Object_class) {
+        throw RuntimeError(stmt.superclass->name,
+            "Superclass must be a class.");
+      }
+    }
+
     environment->define(stmt.name.lexeme, Object::make_nil_obj());
 
     map<string, shared_ptr<LoxFunction>> methods;
@@ -275,7 +284,10 @@ void Interpreter::visitClassStmt(const Class& stmt) {
         methods[method->name.lexeme] = function;
     }
 
-    auto klass = shared_ptr<LoxClass>(new LoxClass(stmt.name.lexeme, methods));
+    auto klass = shared_ptr<LoxClass>(
+        new LoxClass(stmt.name.lexeme, superclass.lox_class, methods)
+    );
+
     environment->assign(stmt.name, Object::make_class_obj(klass));
 }
 

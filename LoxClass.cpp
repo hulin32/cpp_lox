@@ -46,5 +46,8 @@ shared_ptr<LoxFunction> LoxClass::findMethod(string name) {
     if (searched != methods.end()) {
         return searched->second;
     }
+    if (superclass != nullptr) {
+      return superclass->findMethod(name);
+    }
     return nullptr;
 }

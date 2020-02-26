@@ -47,6 +47,9 @@ class Set;
 template<class R>
 class This;
 
+template<class R>
+class Super;
+
 template <class R>
 class Visitor {
  public:
@@ -62,7 +65,7 @@ class Visitor {
     virtual R visitGetExpr(shared_ptr<Get<R>> expr) = 0;
     virtual R visitSetExpr(shared_ptr<Set<R>> expr) = 0;
     virtual R visitThisExpr(shared_ptr<This<R>> expr) = 0;
-    // virtual string visitSuperExpr(Super& expr) = 0;
+    virtual R visitSuperExpr(shared_ptr<Super<R>> expr) = 0;
 };
 
 template<class R>
@@ -247,14 +250,18 @@ class This :
     Token keyword;
 };
 
-// template <class R>
-// class Super: public Expr<R> {
-//  public:
-//     Super(Token keyword, Token method);
-//     R accept(shared_ptr<Visitor<R>> visitor) override {
-//         return visitor->visitSuperExpr(*this);
-//     };
-//     Token keyword;
-//     Token method;
-// };
+template <class R>
+class Super:
+    public Expr<R>,
+    public std::enable_shared_from_this<Super<R>>
+{
+ public:
+    Super(Token keyword_, Token method_):
+     keyword(keyword_), method(method_) { };
+    R accept(shared_ptr<Visitor<R>> visitor) override {
+        return visitor->visitSuperExpr(this->shared_from_this());
+    };
+    Token keyword;
+    Token method;
+};
 #endif  // EXPR_HPP_

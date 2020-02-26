@@ -25,6 +25,7 @@ class Interpreter:
     public std::enable_shared_from_this<Interpreter>
 {
  public:
+    Interpreter();
     void interpret(vector<shared_ptr<Stmt>> statements);
     Object visitLiteralExpr(shared_ptr<Literal<Object>> expr);
     Object visitAssignExpr(shared_ptr<Assign<Object>> expr);
@@ -37,6 +38,7 @@ class Interpreter:
     Object visitGetExpr(shared_ptr<Get<Object>> expr);
     Object visitSetExpr(shared_ptr<Set<Object>> expr);
     Object visitThisExpr(shared_ptr<This<Object>> expr);
+    Object visitSuperExpr(shared_ptr<Super<Object>> expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);

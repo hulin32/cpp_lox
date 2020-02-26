@@ -93,6 +93,19 @@ Object Resolver::visitThisExpr(shared_ptr<This<Object>> expr) {
     return Object::make_nil_obj();
 }
 
+Object Resolver::visitSuperExpr(shared_ptr<Super<Object>> expr) {
+    if (currentClass == CLASS_NONE) {
+      lox::error(expr->keyword.line,
+          "Cannot use 'super' outside of a class.");
+    } else if (currentClass != SUBCLASS) {
+      lox::error(expr->keyword.line,
+          "Cannot use 'super' in a class with no superclass.");
+    }
+    resolveLocal(expr, expr->keyword);
+    return Object::make_nil_obj();
+}
+
+
 void Resolver::visitExpressionStmt(const Expression& stmt) {
     resolve(stmt.expression);
 }
@@ -124,12 +137,21 @@ void Resolver::visitClassStmt(const Class& stmt) {
 
     if (stmt.superclass != nullptr &&
         stmt.name.lexeme == stmt.superclass->name.lexeme) {
-      lox::error(stmt.superclass->name.line,
+        lox::error(stmt.superclass->name.line,
           "A class cannot inherit from itself.");
     }
 
     if (stmt.superclass != nullptr) {
-      resolve(stmt.superclass);
+        currentClass = SUBCLASS;
+        resolve(stmt.superclass);
+    }
+
+    if (stmt.superclass != nullptr) {
+        beginScope();
+        auto backed = scopes.back();
+        backed["super"] = true;
+        scopes.pop_back();
+        scopes.emplace_back(backed);
     }
 
     beginScope();
@@ -147,6 +169,8 @@ void Resolver::visitClassStmt(const Class& stmt) {
     }
 
     endScope();
+
+    if (stmt.superclass != nullptr) endScope();
 
     currentClass = enclosingClass;
 }

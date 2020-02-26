@@ -22,8 +22,8 @@ class Environment: public std::enable_shared_from_this<Environment> {
     Object getAt(int distance, string name);
     void assignAt(int distance, Token name, Object value);
     shared_ptr<Environment> ancestor(int distance);
- private:
     shared_ptr<Environment> enclosing;
+ private:
     map<string, Object> values;
 };
 

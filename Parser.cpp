@@ -9,10 +9,9 @@ multiplication → unary ( ( "/" | "*" ) unary )* ;
 unary → ( "!" | "-" ) unary | call ;
 call → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 arguments → expression ( "," expression )* ;
-primary        → "false" | "true" | "nil"
-               | NUMBER | STRING
-               | "(" expression ")"
-               | IDENTIFIER ;
+primary → "true" | "false" | "nil" | "this"
+        | NUMBER | STRING | IDENTIFIER | "(" expression ")"
+        | "super" "." IDENTIFIER ;
 expression → assignment ;
 assignment → ( call "." )? IDENTIFIER "=" assignment
            | logic_or;
@@ -334,6 +333,14 @@ shared_ptr<Expr<Object>> Parser::primary() {
     if (match({ STRING })) {
       return shared_ptr<Expr<Object>>(
         new Literal<Object>(Object::make_str_obj(previous().literal.str)));
+    }
+
+    if (match({ SUPER })) {
+      Token keyword = previous();
+      consume(DOT, "Expect '.' after 'super'.");
+      Token method = consume(IDENTIFIER,
+          "Expect superclass method name.");
+      return shared_ptr<Expr<Object>>(new Super<Object>(keyword, method));
     }
 
     if (match({ THIS })) {

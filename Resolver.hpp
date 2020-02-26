@@ -36,6 +36,7 @@ class Resolver:
     Object visitGetExpr(shared_ptr<Get<Object>> expr);
     Object visitSetExpr(shared_ptr<Set<Object>> expr);
     Object visitThisExpr(shared_ptr<This<Object>> expr);
+    Object visitSuperExpr(shared_ptr<Super<Object>> expr);
     void visitExpressionStmt(const Expression& stmt);
     void visitPrintStmt(const Print& stmt);
     void visitVarStmt(const Var& stmt);
@@ -57,7 +58,8 @@ class Resolver:
     };
     enum ClassType {
         CLASS_NONE,
-        CLASS
+        CLASS,
+        SUBCLASS,
     };
     ClassType currentClass = CLASS_NONE;
     FunctionType currentFunction = FUNCTION_NONE;

@@ -44,6 +44,10 @@ void Interpreter::interpret(vector<shared_ptr<Stmt>> statements) {
     }
 }
 
+Interpreter::Interpreter() {
+    environment = globals;
+}
+
 string Interpreter::stringify(Object object) {
     string text = object.toString();
     string check_str = ".000000";
@@ -234,6 +238,26 @@ Object Interpreter::visitThisExpr(shared_ptr<This<Object>> expr) {
     return lookUpVariable(expr->keyword, expr);
 }
 
+Object Interpreter::visitSuperExpr(shared_ptr<Super<Object>> expr) {
+    int distance = locals[expr];
+    Object superclass = environment->getAt(distance, "super");
+
+    // "this" is always one level nearer than "super"'s environment.
+    Object instance = environment->getAt(distance - 1, "this");
+
+    shared_ptr<LoxFunction> method =
+        superclass.lox_class->findMethod(expr->method.lexeme);
+
+    if (method == nullptr) {
+      throw RuntimeError(expr->method,
+          "Undefined property '" + expr->method.lexeme + "'.");
+    }
+
+    shared_ptr<LoxFunction> binded_method =  method->bind(instance.instance);
+    return Object::make_fun_obj(binded_method);
+}
+
+
 void Interpreter::visitExpressionStmt(const Expression& stmt) {
     evaluate(stmt.expression);
 }
@@ -263,7 +287,7 @@ void Interpreter::visitBlockStmt(const Block& stmt) {
 }
 
 void Interpreter::visitClassStmt(const Class& stmt) {
-    Object superclass;
+    Object superclass = Object::make_nil_obj();
     if (stmt.superclass != nullptr) {
       superclass = evaluate(stmt.superclass);
       if (superclass.type != Object::Object_class) {
@@ -273,6 +297,11 @@ void Interpreter::visitClassStmt(const Class& stmt) {
     }
 
     environment->define(stmt.name.lexeme, Object::make_nil_obj());
+
+    if (stmt.superclass != nullptr) {
+      environment = shared_ptr<Environment>(new Environment(environment));
+      environment->define("super", superclass);
+    }
 
     map<string, shared_ptr<LoxFunction>> methods;
     for (auto method : stmt.methods) {
@@ -287,6 +316,10 @@ void Interpreter::visitClassStmt(const Class& stmt) {
     auto klass = shared_ptr<LoxClass>(
         new LoxClass(stmt.name.lexeme, superclass.lox_class, methods)
     );
+
+    if (superclass.type != Object::Object_nil) {
+      environment = environment->enclosing;
+    }
 
     environment->assign(stmt.name, Object::make_class_obj(klass));
 }
